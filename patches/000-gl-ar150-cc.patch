@@ -145,7 +145,7 @@
 +# See /LICENSE for more information.
 +#
 +define Profile/GL_AR150
-+	NAME:=GL_ar150 wifi for things
++	NAME:=GL_ar150
 +	PACKAGES:=kmod-usb-core kmod-usb2
 +endef
 +
