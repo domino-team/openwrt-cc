@@ -426,15 +426,6 @@ ar71xx_board_detect() {
 	*"Dragino v2")
 		name="dragino2"
 		;;
-	*"GL_ar150 board")
-		name="gl_ar150"
-		;;
-	*"GL AR300")
-		name="gl-ar300"
-		;;
-	*"Domino board")
-		name="domino"
-		;;
 	*"EAP300 v2")
 		name="eap300v2"
 		;;

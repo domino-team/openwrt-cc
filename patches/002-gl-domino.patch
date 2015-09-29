@@ -1,0 +1,273 @@
+--- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
++++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
+@@ -181,6 +181,10 @@ gl_ar300)
+ 	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar300:wlan" "phy0tpt"
+ 	;;
+ 
++domino)
++	ucidef_set_led_wlan "wlan" "WLAN" "domino:blue:wlan" "phy0tpt"
++	;;
++
+ gl-inet)
+ 	ucidef_set_led_netdev "lan" "LAN" "gl-connect:green:lan" "eth1"
+ 	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
+--- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
++++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
+@@ -376,6 +376,7 @@ alfa-nx |\
+ ap83 |\
+ gl-inet |\
+ gl_ar150 |\
++domino |\
+ jwap003 |\
+ pb42 |\
+ pb44 |\
+--- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
++++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
+@@ -432,6 +432,9 @@ ar71xx_board_detect() {
+ 	*"GL AR300")
+ 		name="gl-ar300"
+ 		;;
++	*"Domino board")
++		name="domino"
++		;;
+ 	*"EAP300 v2")
+ 		name="eap300v2"
+ 		;;
+--- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
+@@ -212,6 +212,7 @@ platform_check_image() {
+ 	dragino2 | \
+ 	gl_ar150 | \
+ 	gl-ar300 | \
++	domino | \
+ 	epg5000 | \
+ 	esr1750 | \
+ 	esr900 | \
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -70,6 +70,7 @@ CONFIG_ATH79_MACH_F9K1115V2=y
+ CONFIG_ATH79_MACH_GL_INET=y
+ CONFIG_ATH79_MACH_GL_AR150=y
+ CONFIG_ATH79_MACH_GL_AR300=y
++CONFIG_ATH79_MACH_DOMINO=y
+ CONFIG_ATH79_MACH_GS_OOLITE=y
+ CONFIG_ATH79_MACH_HIWIFI_HC6361=y
+ CONFIG_ATH79_MACH_HORNET_UB=y
+--- /dev/null
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-domino.c
+@@ -0,0 +1,137 @@
++/*
++ *  Domino board support
++ *
++ *  Copyright (C) 2011 dongyuqi <729650915@qq.com>
++ *  Copyright (C) 2011-2012 Gabor Juhos <juhosg@openwrt.org>
++ *  Copyright (C) 2013 alzhao <alzhao@gmail.com>
++ *  Copyright (C) 2014 Michel Stempin <michel.stempin@wanadoo.fr>
++ *
++ *  This program is free software; you can redistribute it and/or modify it
++ *  under the terms of the GNU General Public License version 2 as published
++ *  by the Free Software Foundation.
++*/
++
++#include <linux/gpio.h>
++
++#include <asm/mach-ath79/ath79.h>
++
++#include "dev-eth.h"
++#include "dev-gpio-buttons.h"
++#include "dev-leds-gpio.h"
++#include "dev-m25p80.h"
++#include "dev-usb.h"
++#include "dev-wmac.h"
++#include "machtypes.h"
++
++#define DOMINO_GPIO_LED_WLAN		0
++#define DOMINO_GPIO_LED_WAN			17
++#define DOMINO_GPIO_LED_USB			1
++#define DOMINO_GPIO_LED_LAN1		13
++#define DOMINO_GPIO_LED_LAN2		14
++#define DOMINO_GPIO_LED_LAN3		15
++#define DOMINO_GPIO_LED_LAN4		16
++#define DOMINO_GPIO_LED_SYS			27
++#define DOMINO_GPIO_LED_WPS			26
++#define DOMINO_GPIO_USB_POWER		6
++
++#define DOMINO_GPIO_BTN_RESET		11
++#define DOMINO_GPIO_BTN_WPS			20
++
++#define DOMINO_KEYS_POLL_INTERVAL	20	/* msecs */
++#define DOMINO_KEYS_DEBOUNCE_INTERVAL	(3 * DOMINO_KEYS_POLL_INTERVAL)
++
++#define DOMINO_MAC0_OFFSET	0x0000
++#define	DOMINO_MAC1_OFFSET	0x0000
++#define DOMINO_CALDATA_OFFSET	0x1000
++#define DOMINO_WMAC_MAC_OFFSET	0x0000
++
++static struct gpio_led domino_leds_gpio[] __initdata = {
++	{
++		.name = "domino:blue:wlan",
++		.gpio = DOMINO_GPIO_LED_WLAN,
++		.active_low = 0,
++	},
++	{
++		.name = "domino:red:wan",
++		.gpio = DOMINO_GPIO_LED_WAN,
++		.active_low = 1,
++	},
++	{
++		.name = "domino:white:usb",
++		.gpio = DOMINO_GPIO_LED_USB,
++		.active_low = 0,
++	},
++	{
++		.name = "domino:green:lan1",
++		.gpio = DOMINO_GPIO_LED_LAN1,
++		.active_low = 0,
++	},
++	{
++		.name = "domino:yellow:wps",
++		.gpio = DOMINO_GPIO_LED_WPS,
++		.active_low = 1,
++	},
++	{
++		.name = "domino:orange:sys",
++		.gpio = DOMINO_GPIO_LED_SYS,
++		.active_low = 1,
++	},
++};
++
++static struct gpio_keys_button domino_gpio_keys[] __initdata = {
++	{
++		.desc = "reset",
++		.type = EV_KEY,
++		.code = KEY_RESTART,
++		.debounce_interval = DOMINO_KEYS_DEBOUNCE_INTERVAL,
++		.gpio = DOMINO_GPIO_BTN_RESET,
++		.active_low = 0,
++	},
++	{
++		.desc = "wps",
++		.type = EV_KEY,
++		.code = KEY_WPS_BUTTON,
++		.debounce_interval = DOMINO_KEYS_DEBOUNCE_INTERVAL,
++		.gpio = DOMINO_GPIO_BTN_WPS,
++		.active_low = 0,
++	}
++};
++
++static void __init domino_setup(void)
++{
++
++	/* ART base address */
++	u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
++
++	/* disable PHY_SWAP and PHY_ADDR_SWAP bits */
++	ath79_setup_ar933x_phy4_switch(false, false);
++
++	/* register flash. */
++	ath79_register_m25p80(NULL);
++
++	/* register gpio LEDs and keys */
++	ath79_register_leds_gpio(-1, ARRAY_SIZE(domino_leds_gpio),
++				 domino_leds_gpio);
++	ath79_register_gpio_keys_polled(-1, DOMINO_KEYS_POLL_INTERVAL,
++					ARRAY_SIZE(domino_gpio_keys),
++					domino_gpio_keys);
++
++	gpio_request_one(DOMINO_GPIO_USB_POWER,
++			 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
++			 "USB power");
++	/* enable usb */
++	ath79_register_usb();
++
++	/* register eth0 as WAN, eth1 as LAN */
++	ath79_init_mac(ath79_eth0_data.mac_addr, art+DOMINO_MAC0_OFFSET, 0);
++	ath79_init_mac(ath79_eth1_data.mac_addr, art+DOMINO_MAC1_OFFSET, 0);
++	ath79_register_mdio(0, 0x0);
++	ath79_register_eth(0);
++	ath79_register_eth(1);
++
++	/* register wireless mac with cal data */
++	ath79_register_wmac(art + DOMINO_CALDATA_OFFSET, art + DOMINO_WMAC_MAC_OFFSET);
++}
++
++MIPS_MACHINE(ATH79_MACH_DOMINO, "DOMINO", "Domino board",
++	     domino_setup);
+--- /dev/null
++++ b/target/linux/ar71xx/generic/profiles/domino.mk
+@@ -0,0 +1,16 @@
++#
++# Copyright (C) 2013 OpenWrt.org
++#
++# This is free software, licensed under the GNU General Public License v2.
++# See /LICENSE for more information.
++#
++define Profile/DOMINO
++	NAME:=Domino wifi for things
++	PACKAGES:=kmod-usb-core kmod-usb2
++endef
++
++define Profile/DOMINO/Description
++	Configuration of Domino, Wifi for everything.
++endef
++
++$(eval $(call Profile,DOMINO))
+--- a/target/linux/ar71xx/image/Makefile
++++ b/target/linux/ar71xx/image/Makefile
+@@ -152,6 +152,14 @@ define Device/gl_ar300
+ endef
+ TARGET_DEVICES += gl_ar300
+ 
++define Device/gl_ar300
++  BOARDNAME = GL_AR300
++  IMAGE_SIZE = 16000k
++  CONSOLE = ttyATH0,115200
++  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
++endef
++TARGET_DEVICES += domino
++
+ 
+ define Device/wndr3700
+   BOARDNAME = WNDR3700
+--- /dev/null
++++ b/target/linux/ar71xx/patches-3.18/913-MIPS-ath79-add-domino-support.patch
+@@ -0,0 +1,39 @@
++--- a/arch/mips/ath79/Kconfig
+++++ b/arch/mips/ath79/Kconfig
++@@ -542,6 +542,16 @@ config ATH79_MACH_GL_AR300
++    select ATH79_DEV_USB
++    select ATH79_DEV_WMAC
++ 
+++config ATH79_MACH_DOMINO
+++   bool "DOMINO support"
+++   select SOC_AR933X
+++   select ATH79_DEV_ETH
+++   select ATH79_DEV_GPIO_BUTTONS
+++   select ATH79_DEV_LEDS_GPIO
+++   select ATH79_DEV_M25P80
+++   select ATH79_DEV_USB
+++   select ATH79_DEV_WMAC
+++
++ config ATH79_MACH_EAP300V2
++ 	bool "EnGenius EAP300 v2 support"
++ 	select SOC_AR934X
++--- a/arch/mips/ath79/Makefile
+++++ b/arch/mips/ath79/Makefile
++@@ -80,6 +80,7 @@ obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= ma
++ obj-$(CONFIG_ATH79_MACH_GL_INET)	+= mach-gl-inet.o
++ obj-$(CONFIG_ATH79_MACH_GL_AR150)  += mach-gl_ar150.o
++ obj-$(CONFIG_ATH79_MACH_GL_AR300)	+= mach-gl-ar300.o
+++obj-$(CONFIG_ATH79_MACH_DOMINO)	+= mach-domino.o
++ obj-$(CONFIG_ATH79_MACH_GS_OOLITE)	+= mach-gs-oolite.o
++ obj-$(CONFIG_ATH79_MACH_HIWIFI_HC6361)	+= mach-hiwifi-hc6361.o
++ obj-$(CONFIG_ATH79_MACH_JA76PF)		+= mach-ja76pf.o
++--- a/arch/mips/ath79/machtypes.h
+++++ b/arch/mips/ath79/machtypes.h
++@@ -69,6 +69,7 @@ enum ath79_mach_type {
++ 	ATH79_MACH_GL_INET,		/* GL-CONNECT GL-INET */
++ 	ATH79_MACH_GL_AR150,	/* GL-AR150 support */
++ 	ATH79_MACH_GL_AR300,		/* GL-AR300 */
+++	ATH79_MACH_DOMINO,		/* Domino */
++ 	ATH79_MACH_GS_OOLITE,           /* GS OOLITE V1.0 */
++ 	ATH79_MACH_HIWIFI_HC6361,	/* HiWiFi HC6361 */
++ 	ATH79_MACH_JA76PF,		/* jjPlus JA76PF */

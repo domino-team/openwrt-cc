@@ -212,7 +212,6 @@ platform_check_image() {
 	dragino2 | \
 	gl_ar150 | \
 	gl-ar300 | \
-	domino | \
 	epg5000 | \
 	esr1750 | \
 	esr900 | \
