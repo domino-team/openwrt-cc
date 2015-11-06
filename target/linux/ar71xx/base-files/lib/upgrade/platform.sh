@@ -205,6 +205,7 @@ platform_check_image() {
 	dir-615-c1 | \
 	dir-615-e1 | \
 	dir-615-e4 | \
+	dir-615-i1 | \
 	dir-825-c1 | \
 	dir-835-a1 | \
 	dlan-pro-500-wp | \
@@ -250,7 +251,8 @@ platform_check_image() {
 	nbg460n_550n_550nh | \
 	unifi | \
 	unifi-outdoor | \
-	carambola2 )
+	carambola2 | \
+	weio )
 		[ "$magic" != "2705" ] && {
 			echo "Invalid image type."
 			return 1
@@ -314,6 +316,7 @@ platform_check_image() {
 	el-mini | \
 	gl-inet | \
 	mc-mac1200r | \
+	minibox-v1 |\
 	onion-omega | \
 	oolite | \
 	smart-300 | \

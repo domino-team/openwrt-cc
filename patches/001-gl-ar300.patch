@@ -1,6 +1,6 @@
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
-@@ -177,6 +177,10 @@ gl_ar150)
+@@ -185,6 +185,10 @@ gl_ar150)
  	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
  	;;
  
@@ -13,7 +13,7 @@
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -386,6 +386,12 @@ wpe72)
+@@ -387,6 +387,12 @@ wpe72)
  	ucidef_set_interfaces_lan_wan "eth1" "eth0"
  	;;
  
@@ -28,7 +28,7 @@
  	ucidef_add_switch "switch0" "1" "1"
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -429,6 +429,9 @@ ar71xx_board_detect() {
+@@ -441,6 +441,9 @@ ar71xx_board_detect() {
  	*"GL_ar150 board")
  		name="gl_ar150"
  		;;
@@ -40,7 +40,7 @@
  		;;
 --- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-@@ -211,6 +211,7 @@ platform_check_image() {
+@@ -212,6 +212,7 @@ platform_check_image() {
  	dlan-pro-1200-ac | \
  	dragino2 | \
  	gl_ar150 | \
@@ -48,16 +48,6 @@
  	epg5000 | \
  	esr1750 | \
  	esr900 | \
---- a/target/linux/ar71xx/config-3.18
-+++ b/target/linux/ar71xx/config-3.18
-@@ -69,6 +69,7 @@ CONFIG_ATH79_MACH_EW_DORIN=y
- CONFIG_ATH79_MACH_F9K1115V2=y
- CONFIG_ATH79_MACH_GL_INET=y
- CONFIG_ATH79_MACH_GL_AR150=y
-+CONFIG_ATH79_MACH_GL_AR300=y
- CONFIG_ATH79_MACH_GS_OOLITE=y
- CONFIG_ATH79_MACH_HIWIFI_HC6361=y
- CONFIG_ATH79_MACH_HORNET_UB=y
 --- /dev/null
 +++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-ar300.c
 @@ -0,0 +1,111 @@
@@ -193,7 +183,7 @@
 +$(eval $(call Profile,GL-AR300))
 --- a/target/linux/ar71xx/image/Makefile
 +++ b/target/linux/ar71xx/image/Makefile
-@@ -144,6 +144,15 @@ define Device/gl_ar150
+@@ -152,6 +152,15 @@ define Device/gl_ar150
  endef
  TARGET_DEVICES += gl_ar150
  
@@ -251,3 +241,13 @@
 + 	ATH79_MACH_GS_OOLITE,           /* GS OOLITE V1.0 */
 + 	ATH79_MACH_HIWIFI_HC6361,	/* HiWiFi HC6361 */
 + 	ATH79_MACH_JA76PF,		/* jjPlus JA76PF */
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -70,6 +70,7 @@ CONFIG_ATH79_MACH_EW_DORIN=y
+ CONFIG_ATH79_MACH_F9K1115V2=y
+ CONFIG_ATH79_MACH_GL_INET=y
+ CONFIG_ATH79_MACH_GL_AR150=y
++CONFIG_ATH79_MACH_GL_AR300=y
+ CONFIG_ATH79_MACH_GS_MINIBOX_V1=y
+ CONFIG_ATH79_MACH_GS_OOLITE=y
+ CONFIG_ATH79_MACH_HIWIFI_HC6361=y

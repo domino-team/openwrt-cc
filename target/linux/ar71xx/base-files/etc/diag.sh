@@ -12,9 +12,11 @@ get_status_led() {
 	all0305)
 		status_led="eap7660d:green:ds4"
 		;;
-	antminer-s1|\
+	antminer-s1)
+		status_led="antminer-s1:green:system"
+		;;
 	antminer-s3)
-		status_led="bitmain:green:system"
+		status_led="antminer-s3:green:system"
 		;;
 	ap132)
 		status_led="ap132:green:status"
@@ -61,6 +63,7 @@ get_status_led() {
 	dir-505-a1 |\
 	dir-600-a1 |\
 	dir-615-e1 |\
+	dir-615-i1 |\
 	dir-615-e4)
 		status_led="d-link:green:power"
 		;;
@@ -211,6 +214,9 @@ get_status_led() {
 		;;
 	smart-300)
 		status_led="nc-link:green:system"
+		;;
+	minibox-v1)
+		status_led="minibox-v1:green:system"
 		;;
 	oolite)
 		status_led="oolite:red:system"
