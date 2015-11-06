@@ -224,7 +224,7 @@
 @@ -0,0 +1,39 @@
 +--- a/arch/mips/ath79/Kconfig
 ++++ b/arch/mips/ath79/Kconfig
-+@@ -542,6 +542,16 @@ config ATH79_MACH_GL_AR300
++@@ -553,6 +553,16 @@ config ATH79_MACH_GL_AR300
 +    select ATH79_DEV_USB
 +    select ATH79_DEV_WMAC
 + 
@@ -243,24 +243,24 @@
 + 	select SOC_AR934X
 +--- a/arch/mips/ath79/Makefile
 ++++ b/arch/mips/ath79/Makefile
-+@@ -80,6 +80,7 @@ obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= ma
++@@ -81,6 +81,7 @@ obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= ma
 + obj-$(CONFIG_ATH79_MACH_GL_INET)	+= mach-gl-inet.o
-+ obj-$(CONFIG_ATH79_MACH_GL_AR150)  += mach-gl_ar150.o
++ obj-$(CONFIG_ATH79_MACH_GL_AR150)	+= mach-gl_ar150.o
 + obj-$(CONFIG_ATH79_MACH_GL_AR300)	+= mach-gl-ar300.o
-++obj-$(CONFIG_ATH79_MACH_DOMINO)	+= mach-domino.o
+++obj-$(CONFIG_ATH79_MACH_DOMINO)		+= mach-domino.o
++ obj-$(CONFIG_ATH79_MACH_GS_MINIBOX_V1)	+= mach-gs-minibox-v1.o
 + obj-$(CONFIG_ATH79_MACH_GS_OOLITE)	+= mach-gs-oolite.o
 + obj-$(CONFIG_ATH79_MACH_HIWIFI_HC6361)	+= mach-hiwifi-hc6361.o
-+ obj-$(CONFIG_ATH79_MACH_JA76PF)		+= mach-ja76pf.o
 +--- a/arch/mips/ath79/machtypes.h
 ++++ b/arch/mips/ath79/machtypes.h
-+@@ -69,6 +69,7 @@ enum ath79_mach_type {
++@@ -70,6 +70,7 @@ enum ath79_mach_type {
 + 	ATH79_MACH_GL_INET,		/* GL-CONNECT GL-INET */
 + 	ATH79_MACH_GL_AR150,	/* GL-AR150 support */
 + 	ATH79_MACH_GL_AR300,		/* GL-AR300 */
 ++	ATH79_MACH_DOMINO,		/* Domino */
++ 	ATH79_MACH_GS_MINIBOX_V1,	/* Gainstrong MiniBox V1.0 */
 + 	ATH79_MACH_GS_OOLITE,           /* GS OOLITE V1.0 */
 + 	ATH79_MACH_HIWIFI_HC6361,	/* HiWiFi HC6361 */
-+ 	ATH79_MACH_JA76PF,		/* jjPlus JA76PF */
 --- a/target/linux/ar71xx/config-3.18
 +++ b/target/linux/ar71xx/config-3.18
 @@ -71,6 +71,7 @@ CONFIG_ATH79_MACH_F9K1115V2=y
