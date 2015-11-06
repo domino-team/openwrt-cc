@@ -5,7 +5,7 @@
 # See /LICENSE for more information.
 #
 define Profile/DOMINO
-	NAME:=Domino wifi for things
+	NAME:=GL Domino Pi
 	PACKAGES:=kmod-usb-core kmod-usb2
 endef
 
