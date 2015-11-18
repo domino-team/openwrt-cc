@@ -212,7 +212,6 @@ platform_check_image() {
 	dlan-pro-1200-ac | \
 	dragino2 | \
 	gl-ar150 | \
-	gl-ar300 | \
 	epg5000 | \
 	esr1750 | \
 	esr900 | \

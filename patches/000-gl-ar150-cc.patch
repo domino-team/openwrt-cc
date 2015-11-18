@@ -1,6 +1,6 @@
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -442,6 +442,9 @@ ar71xx_board_detect() {
+@@ -454,6 +454,9 @@ ar71xx_board_detect() {
  		name="gl-inet"
  		gl_inet_board_detect
  		;;
@@ -170,7 +170,7 @@
 +$(eval $(call Profile,GL-AR150))
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -374,6 +374,7 @@ dir-505-a1)
+@@ -375,6 +375,7 @@ dir-505-a1)
  alfa-ap96 |\
  alfa-nx |\
  ap83 |\
@@ -180,7 +180,7 @@
  pb42 |\
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
-@@ -173,6 +173,10 @@ dlan-pro-1200-ac)
+@@ -181,6 +181,10 @@ dlan-pro-1200-ac)
  	ucidef_set_led_trigger_gpio "plcr" "dLAN" "devolo:error:dlan" "16" "0"
  	;;
  
@@ -193,7 +193,7 @@
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
 --- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-@@ -210,6 +210,7 @@ platform_check_image() {
+@@ -211,6 +211,7 @@ platform_check_image() {
  	dlan-pro-500-wp | \
  	dlan-pro-1200-ac | \
  	dragino2 | \
@@ -201,21 +201,11 @@
  	epg5000 | \
  	esr1750 | \
  	esr900 | \
---- a/target/linux/ar71xx/config-3.18
-+++ b/target/linux/ar71xx/config-3.18
-@@ -68,6 +68,7 @@ CONFIG_ATH79_MACH_ESR900=y
- CONFIG_ATH79_MACH_EW_DORIN=y
- CONFIG_ATH79_MACH_F9K1115V2=y
- CONFIG_ATH79_MACH_GL_INET=y
-+CONFIG_ATH79_MACH_GL_AR150=y
- CONFIG_ATH79_MACH_GS_OOLITE=y
- CONFIG_ATH79_MACH_HIWIFI_HC6361=y
- CONFIG_ATH79_MACH_HORNET_UB=y
 --- a/target/linux/ar71xx/image/Makefile
 +++ b/target/linux/ar71xx/image/Makefile
-@@ -136,6 +136,14 @@ define Device/carambola2
+@@ -144,6 +144,14 @@ define Device/weio
  endef
- TARGET_DEVICES += carambola2
+ TARGET_DEVICES += weio
  
 +define Device/gl-ar150
 +  BOARDNAME = GL-AR150
@@ -290,3 +280,13 @@
 -endef
 -
 -$(eval $(call Profile,GLINET))
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -68,6 +68,7 @@ CONFIG_ATH79_MACH_ESR1750=y
+ CONFIG_ATH79_MACH_ESR900=y
+ CONFIG_ATH79_MACH_EW_DORIN=y
+ CONFIG_ATH79_MACH_F9K1115V2=y
++CONFIG_ATH79_MACH_GL_AR150=y
+ CONFIG_ATH79_MACH_GL_INET=y
+ CONFIG_ATH79_MACH_GS_MINIBOX_V1=y
+ CONFIG_ATH79_MACH_GS_OOLITE=y
