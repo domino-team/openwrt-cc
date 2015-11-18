@@ -1,18 +1,18 @@
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -438,6 +438,9 @@ ar71xx_board_detect() {
- 	*"Dragino v2")
- 		name="dragino2"
+@@ -442,6 +442,9 @@ ar71xx_board_detect() {
+ 		name="gl-inet"
+ 		gl_inet_board_detect
  		;;
-+	*"GL_ar150 board")
-+		name="gl_ar150"
-+		;;
- 	*"EAP300 v2")
- 		name="eap300v2"
++	*"GL AR150")
++        name="gl-ar150"
++        ;;
+ 	*"EnGenius EPG5000")
+ 		name="epg5000"
  		;;
 --- /dev/null
-+++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl_ar150.c
-@@ -0,0 +1,122 @@
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-ar150.c
+@@ -0,0 +1,125 @@
 +/*
 + *  GL_ar150 board support
 + *
@@ -121,8 +121,11 @@
 +					gl_ar150_gpio_keys);
 +
 +	/* enable usb */
++	gpio_request_one(GL_AR150_GPIO_BIN_USB,
++				 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
++	 			 "USB power");
 +	ath79_register_usb();
-+
++	
 +	/* register eth0 as WAN, eth1 as LAN */
 +	ath79_init_mac(ath79_eth0_data.mac_addr, art+GL_AR150_MAC0_OFFSET, 0);
 +	ath79_init_mac(ath79_eth1_data.mac_addr, art+GL_AR150_MAC1_OFFSET, 0);
@@ -134,43 +137,54 @@
 +	ath79_register_wmac(art + GL_AR150_CALDATA_OFFSET, art + GL_AR150_WMAC_MAC_OFFSET);
 +}
 +
-+MIPS_MACHINE(ATH79_MACH_GL_AR150, "GL_AR150", "GL_ar150 board",gl_ar150_setup);
++MIPS_MACHINE(ATH79_MACH_GL_AR150, "GL-AR150", "GL AR150",gl_ar150_setup);
 --- /dev/null
-+++ b/target/linux/ar71xx/generic/profiles/gl_ar150.mk
-@@ -0,0 +1,16 @@
++++ b/target/linux/ar71xx/generic/profiles/gli.mk
+@@ -0,0 +1,27 @@
 +#
 +# Copyright (C) 2013 OpenWrt.org
 +#
 +# This is free software, licensed under the GNU General Public License v2.
 +# See /LICENSE for more information.
 +#
-+define Profile/GL_AR150
++define Profile/GLINET
++	NAME:=GL.iNet 6416
++	PACKAGES:=kmod-usb-core kmod-usb2
++endef
++
++define Profile/GLINET/Description
++	Package set optimized for the GL-Connect GL.iNet v1.
++endef
++
++$(eval $(call Profile,GLINET))
++
++define Profile/GL-AR150
 +	NAME:=GL AR150
 +	PACKAGES:=kmod-usb-core kmod-usb2
 +endef
 +
-+define Profile/GL_AR150/Description
++define Profile/GL-AR150/Description
 +	Configuration of GL AR150.
 +endef
 +
-+$(eval $(call Profile,GL_AR150))
++$(eval $(call Profile,GL-AR150))
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -376,6 +376,7 @@ alfa-ap96 |\
+@@ -374,6 +374,7 @@ dir-505-a1)
+ alfa-ap96 |\
  alfa-nx |\
  ap83 |\
++gl-ar150 |\
  gl-inet |\
-+gl_ar150 |\
  jwap003 |\
  pb42 |\
- pb44 |\
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
-@@ -181,6 +181,10 @@ dlan-pro-1200-ac)
+@@ -173,6 +173,10 @@ dlan-pro-1200-ac)
  	ucidef_set_led_trigger_gpio "plcr" "dLAN" "devolo:error:dlan" "16" "0"
  	;;
  
-+gl_ar150)
++gl-ar150)
 +	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
 +	;;
 +
@@ -179,27 +193,37 @@
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
 --- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-@@ -211,6 +211,7 @@ platform_check_image() {
+@@ -210,6 +210,7 @@ platform_check_image() {
  	dlan-pro-500-wp | \
  	dlan-pro-1200-ac | \
  	dragino2 | \
-+	gl_ar150 | \
++	gl-ar150 | \
  	epg5000 | \
  	esr1750 | \
  	esr900 | \
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -68,6 +68,7 @@ CONFIG_ATH79_MACH_ESR900=y
+ CONFIG_ATH79_MACH_EW_DORIN=y
+ CONFIG_ATH79_MACH_F9K1115V2=y
+ CONFIG_ATH79_MACH_GL_INET=y
++CONFIG_ATH79_MACH_GL_AR150=y
+ CONFIG_ATH79_MACH_GS_OOLITE=y
+ CONFIG_ATH79_MACH_HIWIFI_HC6361=y
+ CONFIG_ATH79_MACH_HORNET_UB=y
 --- a/target/linux/ar71xx/image/Makefile
 +++ b/target/linux/ar71xx/image/Makefile
-@@ -144,6 +144,14 @@ define Device/weio
+@@ -136,6 +136,14 @@ define Device/carambola2
  endef
- TARGET_DEVICES += weio
+ TARGET_DEVICES += carambola2
  
-+define Device/gl_ar150
-+  BOARDNAME = GL_AR150
++define Device/gl-ar150
++  BOARDNAME = GL-AR150
 +  IMAGE_SIZE = 16000k
 +  CONSOLE = ttyATH0,115200
 +  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
 +endef
-+TARGET_DEVICES += gl_ar150
++TARGET_DEVICES += gl-ar150
 +
  define Device/wndr3700
    BOARDNAME = WNDR3700
@@ -209,12 +233,12 @@
 @@ -0,0 +1,39 @@
 +--- a/arch/mips/ath79/Kconfig
 ++++ b/arch/mips/ath79/Kconfig
-+@@ -533,6 +533,16 @@ config ATH79_MACH_GL_INET
++@@ -522,6 +522,16 @@ config ATH79_MACH_GL_INET
 + 	select ATH79_DEV_USB
 + 	select ATH79_DEV_WMAC
 + 
 ++config ATH79_MACH_GL_AR150
-++   bool "GL_AR150 support"
+++   bool "GL AR150 support"
 ++   select SOC_AR933X
 ++   select ATH79_DEV_ETH
 ++   select ATH79_DEV_GPIO_BUTTONS
@@ -228,31 +252,41 @@
 + 	select SOC_AR934X
 +--- a/arch/mips/ath79/Makefile
 ++++ b/arch/mips/ath79/Makefile
-+@@ -79,6 +79,7 @@ obj-$(CONFIG_ATH79_MACH_EPG5000)	+= mach
++@@ -78,6 +78,7 @@ obj-$(CONFIG_ATH79_MACH_EPG5000)	+= mach
 + obj-$(CONFIG_ATH79_MACH_ESR1750)	+= mach-esr1750.o
 + obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= mach-f9k1115v2.o
 + obj-$(CONFIG_ATH79_MACH_GL_INET)	+= mach-gl-inet.o
-++obj-$(CONFIG_ATH79_MACH_GL_AR150)	+= mach-gl_ar150.o
-+ obj-$(CONFIG_ATH79_MACH_GS_MINIBOX_V1)	+= mach-gs-minibox-v1.o
+++obj-$(CONFIG_ATH79_MACH_GL_AR150)  += mach-gl-ar150.o
 + obj-$(CONFIG_ATH79_MACH_GS_OOLITE)	+= mach-gs-oolite.o
 + obj-$(CONFIG_ATH79_MACH_HIWIFI_HC6361)	+= mach-hiwifi-hc6361.o
++ obj-$(CONFIG_ATH79_MACH_JA76PF)		+= mach-ja76pf.o
 +--- a/arch/mips/ath79/machtypes.h
 ++++ b/arch/mips/ath79/machtypes.h
-+@@ -68,6 +68,7 @@ enum ath79_mach_type {
++@@ -67,6 +67,7 @@ enum ath79_mach_type {
 + 	ATH79_MACH_EPG5000,		/* EnGenius EPG5000 */
 + 	ATH79_MACH_F9K1115V2,		/* Belkin AC1750DB */
 + 	ATH79_MACH_GL_INET,		/* GL-CONNECT GL-INET */
 ++	ATH79_MACH_GL_AR150,	/* GL-AR150 support */
-+ 	ATH79_MACH_GS_MINIBOX_V1,	/* Gainstrong MiniBox V1.0 */
 + 	ATH79_MACH_GS_OOLITE,           /* GS OOLITE V1.0 */
 + 	ATH79_MACH_HIWIFI_HC6361,	/* HiWiFi HC6361 */
---- a/target/linux/ar71xx/config-3.18
-+++ b/target/linux/ar71xx/config-3.18
-@@ -69,6 +69,7 @@ CONFIG_ATH79_MACH_ESR900=y
- CONFIG_ATH79_MACH_EW_DORIN=y
- CONFIG_ATH79_MACH_F9K1115V2=y
- CONFIG_ATH79_MACH_GL_INET=y
-+CONFIG_ATH79_MACH_GL_AR150=y
- CONFIG_ATH79_MACH_GS_MINIBOX_V1=y
- CONFIG_ATH79_MACH_GS_OOLITE=y
- CONFIG_ATH79_MACH_HIWIFI_HC6361=y
++ 	ATH79_MACH_JA76PF,		/* jjPlus JA76PF */
+--- a/target/linux/ar71xx/generic/profiles/gl-connect.mk
++++ /dev/null
+@@ -1,17 +0,0 @@
+-#
+-# Copyright (C) 2014 OpenWrt.org
+-#
+-# This is free software, licensed under the GNU General Public License v2.
+-# See /LICENSE for more information.
+-#
+-
+-define Profile/GLINET
+-	NAME:=GL.iNet
+-	PACKAGES:=kmod-usb-core kmod-usb2
+-endef
+-
+-define Profile/GLINET/Description
+-	Package set optimized for the GL-Connect GL.iNet v1.
+-endef
+-
+-$(eval $(call Profile,GLINET))

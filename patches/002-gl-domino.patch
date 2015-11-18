@@ -1,51 +1,51 @@
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
-@@ -189,6 +189,10 @@ gl_ar300)
+@@ -181,6 +181,10 @@ gl-ar300)
  	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar300:wlan" "phy0tpt"
  	;;
  
-+domino)
++gl-domino)
 +	ucidef_set_led_wlan "wlan" "WLAN" "domino:blue:wlan" "phy0tpt"
 +	;;
 +
  gl-inet)
  	ucidef_set_led_netdev "lan" "LAN" "gl-connect:green:lan" "eth1"
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
---- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-+++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -377,6 +377,7 @@ alfa-nx |\
- ap83 |\
- gl-inet |\
- gl_ar150 |\
-+domino |\
- jwap003 |\
- pb42 |\
- pb44 |\
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -444,6 +444,9 @@ ar71xx_board_detect() {
+@@ -426,6 +426,9 @@ ar71xx_board_detect() {
+ 	*"Dragino v2")
+ 		name="dragino2"
+ 		;;
++	*"Domino Pi")
++		name="gl-domino"
++		;;
  	*"GL AR300")
  		name="gl-ar300"
  		;;
-+	*"Domino board")
-+		name="domino"
-+		;;
- 	*"EAP300 v2")
- 		name="eap300v2"
- 		;;
 --- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-@@ -213,6 +213,7 @@ platform_check_image() {
+@@ -212,6 +212,7 @@ platform_check_image() {
  	dragino2 | \
- 	gl_ar150 | \
+ 	gl-ar150 | \
  	gl-ar300 | \
-+	domino | \
++	gl-domino | \
  	epg5000 | \
  	esr1750 | \
  	esr900 | \
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -70,6 +70,7 @@ CONFIG_ATH79_MACH_F9K1115V2=y
+ CONFIG_ATH79_MACH_GL_INET=y
+ CONFIG_ATH79_MACH_GL_AR150=y
+ CONFIG_ATH79_MACH_GL_AR300=y
++CONFIG_ATH79_MACH_GL_DOMINO=y
+ CONFIG_ATH79_MACH_GS_OOLITE=y
+ CONFIG_ATH79_MACH_HIWIFI_HC6361=y
+ CONFIG_ATH79_MACH_HORNET_UB=y
 --- /dev/null
-+++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-domino.c
-@@ -0,0 +1,137 @@
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-domino.c
+@@ -0,0 +1,136 @@
 +/*
 + *  Domino board support
 + *
@@ -181,54 +181,17 @@
 +	ath79_register_wmac(art + DOMINO_CALDATA_OFFSET, art + DOMINO_WMAC_MAC_OFFSET);
 +}
 +
-+MIPS_MACHINE(ATH79_MACH_DOMINO, "DOMINO", "Domino board",
-+	     domino_setup);
---- /dev/null
-+++ b/target/linux/ar71xx/generic/profiles/domino.mk
-@@ -0,0 +1,16 @@
-+#
-+# Copyright (C) 2013 OpenWrt.org
-+#
-+# This is free software, licensed under the GNU General Public License v2.
-+# See /LICENSE for more information.
-+#
-+define Profile/DOMINO
-+	NAME:=GL Domino Pi
-+	PACKAGES:=kmod-usb-core kmod-usb2
-+endef
-+
-+define Profile/DOMINO/Description
-+	Configuration of Domino, Wifi for everything.
-+endef
-+
-+$(eval $(call Profile,DOMINO))
---- a/target/linux/ar71xx/image/Makefile
-+++ b/target/linux/ar71xx/image/Makefile
-@@ -160,6 +160,14 @@ define Device/gl_ar300
- endef
- TARGET_DEVICES += gl_ar300
- 
-+define Device/domino
-+  BOARDNAME = DOMINO
-+  IMAGE_SIZE = 16000k
-+  CONSOLE = ttyATH0,115200
-+  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
-+endef
-+TARGET_DEVICES += domino
-+
- 
- define Device/wndr3700
-   BOARDNAME = WNDR3700
++MIPS_MACHINE(ATH79_MACH_GL_DOMINO, "DOMINO", "Domino Pi", domino_setup);
 --- /dev/null
 +++ b/target/linux/ar71xx/patches-3.18/913-MIPS-ath79-add-domino-support.patch
 @@ -0,0 +1,39 @@
 +--- a/arch/mips/ath79/Kconfig
 ++++ b/arch/mips/ath79/Kconfig
-+@@ -553,6 +553,16 @@ config ATH79_MACH_GL_AR300
++@@ -542,6 +542,16 @@ config ATH79_MACH_GL_AR300
 +    select ATH79_DEV_USB
 +    select ATH79_DEV_WMAC
 + 
-++config ATH79_MACH_DOMINO
+++config ATH79_MACH_GL_DOMINO
 ++   bool "DOMINO support"
 ++   select SOC_AR933X
 ++   select ATH79_DEV_ETH
@@ -243,31 +206,65 @@
 + 	select SOC_AR934X
 +--- a/arch/mips/ath79/Makefile
 ++++ b/arch/mips/ath79/Makefile
-+@@ -81,6 +81,7 @@ obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= ma
++@@ -80,6 +80,7 @@ obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= ma
 + obj-$(CONFIG_ATH79_MACH_GL_INET)	+= mach-gl-inet.o
-+ obj-$(CONFIG_ATH79_MACH_GL_AR150)	+= mach-gl_ar150.o
++ obj-$(CONFIG_ATH79_MACH_GL_AR150)  += mach-gl-ar150.o
 + obj-$(CONFIG_ATH79_MACH_GL_AR300)	+= mach-gl-ar300.o
-++obj-$(CONFIG_ATH79_MACH_DOMINO)		+= mach-domino.o
-+ obj-$(CONFIG_ATH79_MACH_GS_MINIBOX_V1)	+= mach-gs-minibox-v1.o
+++obj-$(CONFIG_ATH79_MACH_GL_DOMINO)	+= mach-gl-domino.o
 + obj-$(CONFIG_ATH79_MACH_GS_OOLITE)	+= mach-gs-oolite.o
 + obj-$(CONFIG_ATH79_MACH_HIWIFI_HC6361)	+= mach-hiwifi-hc6361.o
++ obj-$(CONFIG_ATH79_MACH_JA76PF)		+= mach-ja76pf.o
 +--- a/arch/mips/ath79/machtypes.h
 ++++ b/arch/mips/ath79/machtypes.h
-+@@ -70,6 +70,7 @@ enum ath79_mach_type {
++@@ -69,6 +69,7 @@ enum ath79_mach_type {
 + 	ATH79_MACH_GL_INET,		/* GL-CONNECT GL-INET */
 + 	ATH79_MACH_GL_AR150,	/* GL-AR150 support */
 + 	ATH79_MACH_GL_AR300,		/* GL-AR300 */
-++	ATH79_MACH_DOMINO,		/* Domino */
-+ 	ATH79_MACH_GS_MINIBOX_V1,	/* Gainstrong MiniBox V1.0 */
+++	ATH79_MACH_GL_DOMINO,		/* Domino */
 + 	ATH79_MACH_GS_OOLITE,           /* GS OOLITE V1.0 */
 + 	ATH79_MACH_HIWIFI_HC6361,	/* HiWiFi HC6361 */
---- a/target/linux/ar71xx/config-3.18
-+++ b/target/linux/ar71xx/config-3.18
-@@ -71,6 +71,7 @@ CONFIG_ATH79_MACH_F9K1115V2=y
- CONFIG_ATH79_MACH_GL_INET=y
- CONFIG_ATH79_MACH_GL_AR150=y
- CONFIG_ATH79_MACH_GL_AR300=y
-+CONFIG_ATH79_MACH_DOMINO=y
- CONFIG_ATH79_MACH_GS_MINIBOX_V1=y
- CONFIG_ATH79_MACH_GS_OOLITE=y
- CONFIG_ATH79_MACH_HIWIFI_HC6361=y
++ 	ATH79_MACH_JA76PF,		/* jjPlus JA76PF */
+--- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
++++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
+@@ -375,6 +375,7 @@ alfa-ap96 |\
+ alfa-nx |\
+ ap83 |\
+ gl-ar150 |\
++gl-domino |\
+ gl-inet |\
+ jwap003 |\
+ pb42 |\
+--- a/target/linux/ar71xx/generic/profiles/gli.mk
++++ b/target/linux/ar71xx/generic/profiles/gli.mk
+@@ -36,3 +36,14 @@ define Profile/GL-AR300/Description
+ endef
+ 
+ $(eval $(call Profile,GL-AR300))
++
++define Profile/DOMINO
++	NAME:=GL Domino Pi
++	PACKAGES:=kmod-usb-core kmod-usb2
++endef
++
++define Profile/DOMINO/Description
++	Configuration of Domino, Wifi for everything.
++endef
++
++$(eval $(call Profile,DOMINO))
+--- a/target/linux/ar71xx/image/Makefile
++++ b/target/linux/ar71xx/image/Makefile
+@@ -152,6 +152,14 @@ define Device/gl-ar300
+ endef
+ TARGET_DEVICES += gl-ar300
+ 
++define Device/gl-domino
++  BOARDNAME = DOMINO
++  IMAGE_SIZE = 16000k
++  CONSOLE = ttyATH0,115200
++  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
++endef
++TARGET_DEVICES += gl-domino
++
+ define Device/wndr3700
+   BOARDNAME = WNDR3700
+   NETGEAR_KERNEL_MAGIC = 0x33373030
