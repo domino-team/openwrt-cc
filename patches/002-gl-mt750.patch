@@ -1,0 +1,256 @@
+--- a/target/linux/ramips/base-files/lib/ramips.sh
++++ b/target/linux/ramips/base-files/lib/ramips.sh
+@@ -175,6 +175,9 @@ ramips_board_detect() {
+ 	*"GL-MT300N")
+ 		name="gl-mt300n"
+ 		;;
++	*"GL-MT750")
++		name="gl-mt750"
++		;;
+ 	*"Hauppauge Broadway")
+ 		name="broadway"
+ 		;;
+--- a/target/linux/ramips/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ramips/base-files/lib/upgrade/platform.sh
+@@ -56,6 +56,7 @@ platform_check_image() {
+ 	firewrt |\
+ 	gl-mt300a |\
+ 	gl-mt300n |\
++	gl-mt750 |\
+ 	pbr-m1 |\
+ 	hg255d | \
+ 	hlk-rm04 | \
+--- a/target/linux/ramips/image/Makefile
++++ b/target/linux/ramips/image/Makefile
+@@ -885,6 +885,7 @@ Image/Build/Profile/WT3020=$(call BuildF
+ Image/Build/Profile/XIAOMI-MIWIFI-MINI=$(call BuildFirmware/Default16M/$(1),$(1),xiaomi-miwifi-mini,XIAOMI-MIWIFI-MINI)
+ Image/Build/Profile/GL-MT300A=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300a,GL-MT300A)
+ Image/Build/Profile/GL-MT300N=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300n,GL-MT300N)
++Image/Build/Profile/GL-MT750=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt750,GL-MT750)
+ Image/Build/Profile/ZTE-Q7=$(call BuildFirmware/Default8M/$(1),$(1),zte-q7,ZTE-Q7)
+ Image/Build/Profile/ZBT-WA05=$(call BuildFirmware/Default8M/$(1),$(1),zbt-wa05,ZBT-WA05)
+ Image/Build/Profile/ArcherC20i=$(call BuildFirmware/Tplink/$(1),$(1),ArcherC20i,ArcherC20i)
+@@ -920,6 +921,7 @@ define Image/Build/Profile/Default
+ 	$(call Image/Build/Profile/XIAOMI-MIWIFI-MINI,$(1))
+ 	$(call Image/Build/Profile/GL-MT300A,$(1))
+ 	$(call Image/Build/Profile/GL-MT300N,$(1))
++	$(call Image/Build/Profile/GL-MT750,$(1))
+ 	$(call Image/Build/Profile/ZTE-Q7,$(1))
+ 	$(call Image/Build/Profile/ZBT-WA05,$(1))
+ 	$(call Image/Build/Profile/ArcherC20i,$(1))
+--- a/target/linux/ramips/mt7620/profiles/gli.mk
++++ b/target/linux/ramips/mt7620/profiles/gli.mk
+@@ -16,11 +16,21 @@ endef
+ $(eval $(call Profile,GL-MT300A))
+ 
+ define Profile/GL-MT300N
+-    NAME:=GL-MT300N
+-    PACKAGES:=kmod-usb-core kmod-usb-dwc2 kmod-usb2 kmod-usb-ohci kmod-mt76
++	NAME:=GL-MT300N
++	PACKAGES:=kmod-usb-core kmod-usb-dwc2 kmod-usb2 kmod-usb-ohci kmod-mt76
+ endef
+ 
+ define Profile/GL-MT300N/Description
+     Support for gl-mt300n Router
+ endef
+ $(eval $(call Profile,GL-MT300N))
++
++define Profile/GL-MT750
++	NAME:=GL-MT750
++	PACKAGES:=kmod-usb-core kmod-usb-dwc2 kmod-usb2 kmod-usb-ohci kmod-mt76 kmod-mt7610e
++endef
++
++define Profile/GL-MT750/Description
++    Support for gl-mt750 Router
++endef
++$(eval $(call Profile,GL-MT750))
+--- a/target/linux/ramips/base-files/etc/board.d/01_leds
++++ b/target/linux/ramips/base-files/etc/board.d/01_leds
+@@ -149,6 +149,9 @@ case $board in
+ 	gl-mt300n)
+ 		set_wifi_led "gl-mt300n:wlan"
+ 		;;
++	gl-mt750)
++		set_wifi_led "gl-mt750:wlan"
++		;;
+ 	mpr-a1)
+ 		set_wifi_led "hame:blue:system"
+ 		;;
+--- a/target/linux/ramips/base-files/etc/board.d/02_network
++++ b/target/linux/ramips/base-files/etc/board.d/02_network
+@@ -165,6 +165,13 @@ ramips_setup_interfaces()
+ 		ucidef_add_switch_vlan "switch0" "2" "0 6t"
+ 		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
+ 		;;
++	
++	gl-mt750)
++		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
++		ucidef_add_switch "switch0" "1" "1"
++		ucidef_add_switch_vlan "switch0" "2" "0 6t"
++		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
++		;;
+ 
+ 	whr-1166d)
+ 		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
+--- /dev/null
++++ b/target/linux/ramips/dts/GL-MT750.dts
+@@ -0,0 +1,159 @@
++/dts-v1/;
++
++/include/ "mt7620a.dtsi"
++
++/ {
++	compatible = "GL-MT750", "ralink,mt7620a-soc";
++	model = "GL-MT750";
++
++	chosen {
++		bootargs = "console=ttyS0,115200";
++	};
++
++	palmbus@10000000 {
++		gpio0: gpio@600 {
++			status = "okay";
++		};
++
++		gpio1: gpio@638 {
++			status = "okay";
++		};
++
++		gpio2: gpio@660 {
++			status = "okay";
++		};
++		
++		gpio3: gpio@688 {
++		      status = "okay";
++		 };
++
++		spi@b00 {
++			status = "okay";
++
++			m25p80@0 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "w25q128";
++				reg = <0 0>;
++				linux,modalias = "m25p80", "w25q128";
++				spi-max-frequency = <10000000>;
++
++				partition@0 {
++					label = "u-boot";
++					reg = <0x0 0x30000>;
++				};
++
++				partition@30000 {
++					label = "u-boot-env";
++					reg = <0x30000 0x10000>;
++					read-only;
++				};
++
++				factory: partition@40000 {
++					label = "factory";
++					reg = <0x40000 0x10000>;
++					read-only;
++				};
++
++				partition@50000 {
++					label = "firmware";
++					reg = <0x50000 0xf80000>;
++				};
++
++				partition@ff0000 {
++					label = "art";
++					reg = <0xff0000 0x10000>;
++				};
++			};
++		};
++	};
++
++	sdhci@10130000 {
++		status = "okay";
++	};
++
++	ehci@101c0000 {
++		status = "okay";
++	};
++
++	ohci@101c1000 {
++		status = "okay";
++	};
++
++	ethernet@10100000 {
++		pinctrl-names = "default";
++		pinctrl-0 = <&ephy_pins>;
++		mtd-mac-address = <&factory 0x4000>;
++		ralink,port-map = "llllw";
++	};
++
++	wmac@10180000 {
++		ralink,mtd-eeprom = <&factory 0>;
++	};
++
++	pcie@10140000 {
++		status = "okay";
++
++		pcie-bridge {
++			mt76@0,0 {
++				reg = <0x0000 0 0 0 0>;
++				device_type = "pci";
++				mediatek,mtd-eeprom = <&factory 0x8000>;
++				mediatek,2ghz = <0>;
++			};
++		};
++	};
++
++	pinctrl {
++		state_default: pinctrl0 {
++			gpio {
++				ralink,group = "wled","ephy","uartf";
++				ralink,function = "gpio";
++			};
++		};
++	};
++
++	gpio-leds {
++		compatible = "gpio-leds";
++
++		wan {
++			label = "gl-mt750:wan";
++			gpios = <&gpio2 0 1>;
++		};
++
++		lan {
++			label = "gl-mt750:lan";
++			gpios = <&gpio2 1 1>;
++		};
++
++		wlan {
++			label = "gl-mt750:wlan";
++			gpios = <&gpio3 0 1>;
++		};
++
++	};
++
++	gpio-keys-polled {
++		compatible = "gpio-keys-polled";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		poll-interval = <20>;
++		reset {
++			label = "reset";
++			gpios = <&gpio0 13 1>;
++			linux,code = <0x198>;
++		};
++
++		BTN_0 {
++			label = "BTN_0";
++			gpios = <&gpio2 2 1>;
++			linux,code = <0x100>;
++		};
++
++  	    BTN_1 {
++			label = "BTN_1";
++			gpios = <&gpio2 3 1>;
++			linux,code = <0x101>;
++		};
++ 	};
++};

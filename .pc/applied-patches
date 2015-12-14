@@ -1,3 +1,7 @@
 000-gl-ar150-cc.patch
 001-gl-ar300.patch
 002-gl-domino.patch
+000-gl-mt300a.patch
+001-gl-mt300n.patch
+002-gl-mt750.patch
+003-gl-mt-all.patch

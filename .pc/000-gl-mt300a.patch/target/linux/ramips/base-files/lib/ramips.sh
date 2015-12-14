@@ -169,15 +169,6 @@ ramips_board_detect() {
 	*"F5D8235 v2")
 		name="f5d8235-v2"
 		;;
-	*"GL-MT300A")
-		name="gl-mt300a"
-		;;
-	*"GL-MT300N")
-		name="gl-mt300n"
-		;;
-	*"GL-MT750")
-		name="gl-mt750"
-		;;
 	*"Hauppauge Broadway")
 		name="broadway"
 		;;

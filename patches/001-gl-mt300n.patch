@@ -1,0 +1,240 @@
+--- a/target/linux/ramips/base-files/lib/ramips.sh
++++ b/target/linux/ramips/base-files/lib/ramips.sh
+@@ -172,6 +172,9 @@ ramips_board_detect() {
+ 	*"GL-MT300A")
+ 		name="gl-mt300a"
+ 		;;
++	*"GL-MT300N")
++		name="gl-mt300n"
++		;;
+ 	*"Hauppauge Broadway")
+ 		name="broadway"
+ 		;;
+--- a/target/linux/ramips/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ramips/base-files/lib/upgrade/platform.sh
+@@ -55,6 +55,7 @@ platform_check_image() {
+ 	freestation5 | \
+ 	firewrt |\
+ 	gl-mt300a |\
++	gl-mt300n |\
+ 	pbr-m1 |\
+ 	hg255d | \
+ 	hlk-rm04 | \
+--- a/target/linux/ramips/mt7620/profiles/gli.mk
++++ b/target/linux/ramips/mt7620/profiles/gli.mk
+@@ -14,3 +14,13 @@ define Profile/GL-MT300A/Description
+ 	Support for gl-mt300a Router
+ endef
+ $(eval $(call Profile,GL-MT300A))
++
++define Profile/GL-MT300N
++    NAME:=GL-MT300N
++    PACKAGES:=kmod-usb-core kmod-usb-dwc2 kmod-usb2 kmod-usb-ohci kmod-mt76
++endef
++
++define Profile/GL-MT300N/Description
++    Support for gl-mt300n Router
++endef
++$(eval $(call Profile,GL-MT300N))
+--- a/target/linux/ramips/image/Makefile
++++ b/target/linux/ramips/image/Makefile
+@@ -884,6 +884,7 @@ Image/Build/Profile/WRTNODE=$(call Build
+ Image/Build/Profile/WT3020=$(call BuildFirmware/PorayDualSize/$(1),$(1),wt3020,WT3020)
+ Image/Build/Profile/XIAOMI-MIWIFI-MINI=$(call BuildFirmware/Default16M/$(1),$(1),xiaomi-miwifi-mini,XIAOMI-MIWIFI-MINI)
+ Image/Build/Profile/GL-MT300A=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300a,GL-MT300A)
++Image/Build/Profile/GL-MT300N=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300n,GL-MT300N)
+ Image/Build/Profile/ZTE-Q7=$(call BuildFirmware/Default8M/$(1),$(1),zte-q7,ZTE-Q7)
+ Image/Build/Profile/ZBT-WA05=$(call BuildFirmware/Default8M/$(1),$(1),zbt-wa05,ZBT-WA05)
+ Image/Build/Profile/ArcherC20i=$(call BuildFirmware/Tplink/$(1),$(1),ArcherC20i,ArcherC20i)
+@@ -918,6 +919,7 @@ define Image/Build/Profile/Default
+ 	$(call Image/Build/Profile/WT3020,$(1))
+ 	$(call Image/Build/Profile/XIAOMI-MIWIFI-MINI,$(1))
+ 	$(call Image/Build/Profile/GL-MT300A,$(1))
++	$(call Image/Build/Profile/GL-MT300N,$(1))
+ 	$(call Image/Build/Profile/ZTE-Q7,$(1))
+ 	$(call Image/Build/Profile/ZBT-WA05,$(1))
+ 	$(call Image/Build/Profile/ArcherC20i,$(1))
+--- a/target/linux/ramips/base-files/etc/board.d/01_leds
++++ b/target/linux/ramips/base-files/etc/board.d/01_leds
+@@ -146,6 +146,9 @@ case $board in
+     gl-mt300a)
+ 		set_wifi_led "gl-mt300a:wlan"
+ 		;;
++	gl-mt300n)
++		set_wifi_led "gl-mt300n:wlan"
++		;;
+ 	mpr-a1)
+ 		set_wifi_led "hame:blue:system"
+ 		;;
+--- a/target/linux/ramips/base-files/etc/board.d/02_network
++++ b/target/linux/ramips/base-files/etc/board.d/02_network
+@@ -158,6 +158,13 @@ ramips_setup_interfaces()
+ 		ucidef_add_switch_vlan "switch0" "2" "0 6t"
+ 		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
+ 		;;
++	
++	gl-mt300n)
++		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
++		ucidef_add_switch "switch0" "1" "1"
++		ucidef_add_switch_vlan "switch0" "2" "0 6t"
++		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
++		;;
+ 
+ 	whr-1166d)
+ 		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
+--- /dev/null
++++ b/target/linux/ramips/dts/GL-MT300N.dts
+@@ -0,0 +1,153 @@
++/dts-v1/;
++
++/include/ "mt7620n.dtsi"
++
++/ {
++	compatible = "GL-MT300N", "ralink,mt7620n-soc";
++	model = "GL-MT300N";
++
++	chosen {
++		bootargs = "console=ttyS0,115200";
++	};
++
++	palmbus@10000000 {
++		gpio0: gpio@600 {
++			status = "okay";
++		};
++
++		gpio1: gpio@638 {
++			status = "okay";
++		};
++
++		gpio2: gpio@660 {
++			status = "okay";
++		};
++		
++		gpio3: gpio@688 {
++		      status = "okay";
++		 };
++
++		spi@b00 {
++			status = "okay";
++
++			m25p80@0 {
++				#address-cells = <1>;
++				#size-cells = <1>;
++				compatible = "w25q128";
++				reg = <0 0>;
++				linux,modalias = "m25p80", "w25q128";
++				spi-max-frequency = <10000000>;
++
++				partition@0 {
++					label = "u-boot";
++					reg = <0x0 0x30000>;
++				};
++
++				partition@30000 {
++					label = "u-boot-env";
++					reg = <0x30000 0x10000>;
++					read-only;
++				};
++
++				factory: partition@40000 {
++					label = "factory";
++					reg = <0x40000 0x10000>;
++					read-only;
++				};
++
++				partition@50000 {
++					label = "firmware";
++					reg = <0x50000 0xf80000>;
++				};
++
++				partition@ff0000 {
++					label = "art";
++					reg = <0xff0000 0x10000>;
++				};
++			};
++		};
++	};
++
++	ehci@101c0000 {
++		status = "okay";
++	};
++
++	ohci@101c1000 {
++		status = "okay";
++	};
++
++	ethernet@10100000 {
++		mtd-mac-address = <&factory 0x4000>;
++		ralink,port-map = "wllll";
++	};
++
++	wmac@10180000 {
++		ralink,mtd-eeprom = <&factory 0>;
++	};
++
++	pcie@10140000 {
++		status = "okay";
++
++		pcie-bridge {
++			mt76@0,0 {
++				reg = <0x0000 0 0 0 0>;
++				device_type = "pci";
++				mediatek,mtd-eeprom = <&factory 0x8000>;
++				mediatek,2ghz = <0>;
++			};
++		};
++	};
++
++	pinctrl {
++		state_default: pinctrl0 {
++			gpio {
++				ralink,group = "wled","ephy","i2c";
++				ralink,function = "gpio";
++			};
++		};
++	};
++
++	gpio-leds {
++		compatible = "gpio-leds";
++
++		wan {
++			label = "gl-mt300n:wan";
++			gpios = <&gpio2 0 1>;
++		};
++
++		lan {
++			label = "gl-mt300n:lan";
++			gpios = <&gpio2 1 1>;
++		};
++
++		wlan {
++			label = "gl-mt300n:wlan";
++			gpios = <&gpio3 0 1>;
++		};
++
++	};
++
++	gpio-keys-polled {
++		compatible = "gpio-keys-polled";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		poll-interval = <20>;
++		reset {
++			label = "reset";
++			gpios = <&gpio0 1 1>;
++			linux,code = <0x198>;
++		};
++
++		BTN_0 {
++			label = "BTN_0";
++			gpios = <&gpio2 2 1>;
++			linux,code = <0x100>;
++		};
++
++  	    BTN_1 {
++			label = "BTN_1";
++			gpios = <&gpio2 3 1>;
++			linux,code = <0x101>;
++		};
++	};
++};
