@@ -438,12 +438,6 @@ ar71xx_board_detect() {
 	*"Dragino v2")
 		name="dragino2"
 		;;
-	*"Domino Pi")
-		name="gl-domino"
-		;;
-	*"GL AR300")
-		name="gl-ar300"
-		;;
 	*"EAP300 v2")
 		name="eap300v2"
 		;;
@@ -460,9 +454,6 @@ ar71xx_board_detect() {
 		name="gl-inet"
 		gl_inet_board_detect
 		;;
-	*"GL AR150")
-        name="gl-ar150"
-        ;;
 	*"EnGenius EPG5000")
 		name="epg5000"
 		;;
