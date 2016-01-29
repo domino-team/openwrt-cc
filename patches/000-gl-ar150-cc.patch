@@ -1,6 +1,6 @@
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -454,6 +454,9 @@ ar71xx_board_detect() {
+@@ -455,6 +455,9 @@ ar71xx_board_detect() {
  		name="gl-inet"
  		gl_inet_board_detect
  		;;

@@ -13,7 +13,7 @@
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -438,6 +438,9 @@ ar71xx_board_detect() {
+@@ -439,6 +439,9 @@ ar71xx_board_detect() {
  	*"Dragino v2")
  		name="dragino2"
  		;;

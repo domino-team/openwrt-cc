@@ -28,7 +28,7 @@
  	ucidef_add_switch "switch0" "1" "1"
 --- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
 +++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
-@@ -438,6 +438,9 @@ ar71xx_board_detect() {
+@@ -439,6 +439,9 @@ ar71xx_board_detect() {
  	*"Dragino v2")
  		name="dragino2"
  		;;
