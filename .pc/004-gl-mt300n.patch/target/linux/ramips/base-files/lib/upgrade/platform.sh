@@ -55,8 +55,6 @@ platform_check_image() {
 	freestation5 | \
 	firewrt |\
 	gl-mt300a |\
-	gl-mt300n |\
-	gl-mt750 |\
 	pbr-m1 |\
 	hg255d | \
 	hlk-rm04 | \

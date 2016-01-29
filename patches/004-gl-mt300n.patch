@@ -68,7 +68,7 @@
  		;;
 --- a/target/linux/ramips/base-files/etc/board.d/02_network
 +++ b/target/linux/ramips/base-files/etc/board.d/02_network
-@@ -158,6 +158,13 @@ ramips_setup_interfaces()
+@@ -159,6 +159,13 @@ ramips_setup_interfaces()
  		ucidef_add_switch_vlan "switch0" "2" "0 6t"
  		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
  		;;

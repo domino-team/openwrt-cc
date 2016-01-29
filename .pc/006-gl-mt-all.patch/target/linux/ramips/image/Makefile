@@ -927,11 +927,6 @@ define Image/Build/Profile/Default
 	$(call Image/Build/Profile/ArcherC20i,$(1))
 	$(call Image/Build/Profile/MicroWRT,$(1))
 endef
-define Image/Build/Profile/GL-MT-ALL
-	$(call Image/Build/Profile/GL-MT300A,$(1))
-	$(call Image/Build/Profile/GL-MT300N,$(1))
-	$(call Image/Build/Profile/GL-MT750,$(1))
-endef
 endif
 
 #
