@@ -12,7 +12,7 @@
  		;;
 --- a/target/linux/ramips/base-files/lib/upgrade/platform.sh
 +++ b/target/linux/ramips/base-files/lib/upgrade/platform.sh
-@@ -55,6 +55,7 @@ platform_check_image() {
+@@ -56,6 +56,7 @@ platform_check_image() {
  	freestation5 | \
  	firewrt |\
  	gl-mt300a |\
@@ -38,7 +38,7 @@
 +$(eval $(call Profile,GL-MT300N))
 --- a/target/linux/ramips/image/Makefile
 +++ b/target/linux/ramips/image/Makefile
-@@ -884,6 +884,7 @@ Image/Build/Profile/WRTNODE=$(call Build
+@@ -911,6 +911,7 @@ Image/Build/Profile/WRTNODE=$(call Build
  Image/Build/Profile/WT3020=$(call BuildFirmware/PorayDualSize/$(1),$(1),wt3020,WT3020)
  Image/Build/Profile/XIAOMI-MIWIFI-MINI=$(call BuildFirmware/Default16M/$(1),$(1),xiaomi-miwifi-mini,XIAOMI-MIWIFI-MINI)
  Image/Build/Profile/GL-MT300A=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300a,GL-MT300A)
@@ -46,7 +46,7 @@
  Image/Build/Profile/ZTE-Q7=$(call BuildFirmware/Default8M/$(1),$(1),zte-q7,ZTE-Q7)
  Image/Build/Profile/ZBT-WA05=$(call BuildFirmware/Default8M/$(1),$(1),zbt-wa05,ZBT-WA05)
  Image/Build/Profile/ArcherC20i=$(call BuildFirmware/Tplink/$(1),$(1),ArcherC20i,ArcherC20i)
-@@ -918,6 +919,7 @@ define Image/Build/Profile/Default
+@@ -946,6 +947,7 @@ define Image/Build/Profile/Default
  	$(call Image/Build/Profile/WT3020,$(1))
  	$(call Image/Build/Profile/XIAOMI-MIWIFI-MINI,$(1))
  	$(call Image/Build/Profile/GL-MT300A,$(1))
@@ -56,7 +56,7 @@
  	$(call Image/Build/Profile/ArcherC20i,$(1))
 --- a/target/linux/ramips/base-files/etc/board.d/01_leds
 +++ b/target/linux/ramips/base-files/etc/board.d/01_leds
-@@ -146,6 +146,9 @@ case $board in
+@@ -150,6 +150,9 @@ case $board in
      gl-mt300a)
  		set_wifi_led "gl-mt300a:wlan"
  		;;
@@ -68,7 +68,7 @@
  		;;
 --- a/target/linux/ramips/base-files/etc/board.d/02_network
 +++ b/target/linux/ramips/base-files/etc/board.d/02_network
-@@ -159,6 +159,13 @@ ramips_setup_interfaces()
+@@ -160,6 +160,13 @@ ramips_setup_interfaces()
  		ucidef_add_switch_vlan "switch0" "2" "0 6t"
  		ucidef_add_switch_vlan "switch0" "1" "1 2 3 4 6t"
  		;;

@@ -170,7 +170,7 @@
 +$(eval $(call Profile,GL-AR150))
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -375,6 +375,7 @@ dir-505-a1)
+@@ -376,6 +376,7 @@ dir-505-a1)
  alfa-ap96 |\
  alfa-nx |\
  ap83 |\

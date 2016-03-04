@@ -13,7 +13,7 @@
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-connect:red:wlan" "phy0tpt"
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -387,6 +387,12 @@ wpe72)
+@@ -388,6 +388,12 @@ wpe72)
  	ucidef_set_interfaces_lan_wan "eth1" "eth0"
  	;;
  

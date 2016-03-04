@@ -216,7 +216,7 @@
 + 	ATH79_MACH_GS_OOLITE,           /* GS OOLITE V1.0 */
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
-@@ -376,6 +376,7 @@ alfa-ap96 |\
+@@ -377,6 +377,7 @@ alfa-ap96 |\
  alfa-nx |\
  ap83 |\
  gl-ar150 |\

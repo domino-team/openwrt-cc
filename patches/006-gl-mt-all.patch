@@ -1,6 +1,6 @@
 --- a/target/linux/ramips/image/Makefile
 +++ b/target/linux/ramips/image/Makefile
-@@ -927,6 +927,11 @@ define Image/Build/Profile/Default
+@@ -955,6 +955,11 @@ define Image/Build/Profile/Default
  	$(call Image/Build/Profile/ArcherC20i,$(1))
  	$(call Image/Build/Profile/MicroWRT,$(1))
  endef
