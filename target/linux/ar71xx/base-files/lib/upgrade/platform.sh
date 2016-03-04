@@ -211,9 +211,6 @@ platform_check_image() {
 	dlan-pro-500-wp | \
 	dlan-pro-1200-ac | \
 	dragino2 | \
-	gl-ar150 | \
-	gl-ar300 | \
-	gl-domino | \
 	epg5000 | \
 	esr1750 | \
 	esr900 | \
@@ -357,6 +354,7 @@ platform_check_image() {
 	tl-wr842n-v2 | \
 	tl-wr941nd | \
 	tl-wr941nd-v5 | \
+	tl-wr941nd-v6 | \
 	tl-wr1041n-v2 | \
 	tl-wr1043nd | \
 	tl-wr1043nd-v2 | \

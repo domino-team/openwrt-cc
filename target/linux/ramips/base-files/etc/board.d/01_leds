@@ -114,6 +114,10 @@ case $board in
 	esr-9753)
 		set_wifi_led "rt2800pci-phy0::radio"
 		;;
+	ex2700)
+		ucidef_set_led_default "power_r" "POWER (red)" "ex2700:red:power" "0"
+		set_wifi_led "ex2700:green:router"
+		;;
 	f5d8235-v1)
 		set_usb_led "f5d8235-v1:blue:storage"
 		;;
@@ -142,15 +146,6 @@ case $board in
 		;;
 	mofi3500-3gn)
 		set_usb_led "mofi3500-3gn:green:usb"
-		;;
-    gl-mt300a)
-		set_wifi_led "gl-mt300a:wlan"
-		;;
-	gl-mt300n)
-		set_wifi_led "gl-mt300n:wlan"
-		;;
-	gl-mt750)
-		set_wifi_led "gl-mt750:wlan"
 		;;
 	mpr-a1)
 		set_wifi_led "hame:blue:system"

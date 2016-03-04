@@ -49,14 +49,12 @@ platform_check_image() {
 	dir-620-d1 | \
 	dir-810l | \
 	e1700 | \
+	ex2700 |\
 	esr-9753 | \
 	f7c027 | \
 	fonera20n | \
 	freestation5 | \
 	firewrt |\
-	gl-mt300a |\
-	gl-mt300n |\
-	gl-mt750 |\
 	pbr-m1 |\
 	hg255d | \
 	hlk-rm04 | \

@@ -854,7 +854,34 @@ endif
 # MT7620A Profiles
 #
 
+# $(1): (ignored)
+# $(2): lowercase board name
+# $(3): uppercase board name (must match DTS filename w/o extension)
+# $(4): erase block size
+# $(5): hardware id for mkdniimg
+# $(6): maximum image size
+define BuildFirmware/Netgear/squashfs
+	$(call PatchKernelLzmaDtb,$(2),$(3))
+	# Pad kernel to eraseblock boundary, minus 2 uImage headers (=128 bytes):
+	# bs = (eraseblock * (1 + (128 + kernelsize)/eraseblock)) - 128
+	dd if=$(KDIR)/vmlinux-$(2).bin.lzma \
+		of=$(KDIR)/vmlinux-$(2).bin.lzma.tmp \
+		bs=`expr \( $(4) \* \( 1 + \( 128 + \`wc -c < $(KDIR)/vmlinux-$(2).bin.lzma\` \) / $(4) \) \) - 128` \
+		count=1 conv=sync
+
+	$(call MkImage,lzma,$(KDIR)/vmlinux-$(2).bin.lzma.tmp,$(KDIR)/vmlinux-$(2).uImage)
+	cat ex2700-fakeroot.uImage >> $(KDIR)/vmlinux-$(2).uImage
+	$(call MkImageSysupgrade/squashfs,squashfs,$(2),$(6))
+
+	$(STAGING_DIR_HOST)/bin/mkdniimg \
+		-B $(3) -H $(5) -v OpenWrt \
+		-i $(call imgname,squashfs,$(2))-sysupgrade.bin \
+		-o $(call imgname,squashfs,$(2))-factory.bin
+endef
+
 Image/Build/Profile/E1700=$(call BuildFirmware/UMedia/$(1),$(1),e1700,E1700,0x013326)
+ex2700_mtd_size=3866624
+Image/Build/Profile/EX2700=$(call BuildFirmware/Netgear/$(1),$(1),ex2700,EX2700,65536,29764623+4+0+32+2x2+0,$(ex2700_mtd_size))
 Image/Build/Profile/MT7620a=$(call BuildFirmware/Default8M/$(1),$(1),mt7620a,MT7620a)
 Image/Build/Profile/MT7620a_MT7610e=$(call BuildFirmware/Default8M/$(1),$(1),mt7620a_mt7610e,MT7620a_MT7610e)
 Image/Build/Profile/MT7620a_MT7530=$(call BuildFirmware/Default8M/$(1),$(1),mt7620a_mt7530,MT7620a_MT7530)
@@ -883,9 +910,6 @@ Image/Build/Profile/WR8305RT=$(call BuildFirmware/Default8M/$(1),$(1),wr8305rt,W
 Image/Build/Profile/WRTNODE=$(call BuildFirmware/Default16M/$(1),$(1),wrtnode,WRTNODE)
 Image/Build/Profile/WT3020=$(call BuildFirmware/PorayDualSize/$(1),$(1),wt3020,WT3020)
 Image/Build/Profile/XIAOMI-MIWIFI-MINI=$(call BuildFirmware/Default16M/$(1),$(1),xiaomi-miwifi-mini,XIAOMI-MIWIFI-MINI)
-Image/Build/Profile/GL-MT300A=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300a,GL-MT300A)
-Image/Build/Profile/GL-MT300N=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300n,GL-MT300N)
-Image/Build/Profile/GL-MT750=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt750,GL-MT750)
 Image/Build/Profile/ZTE-Q7=$(call BuildFirmware/Default8M/$(1),$(1),zte-q7,ZTE-Q7)
 Image/Build/Profile/ZBT-WA05=$(call BuildFirmware/Default8M/$(1),$(1),zbt-wa05,ZBT-WA05)
 Image/Build/Profile/ArcherC20i=$(call BuildFirmware/Tplink/$(1),$(1),ArcherC20i,ArcherC20i)
@@ -896,6 +920,7 @@ Image/Build/Profile/MicroWRT=$(call BuildFirmware/CustomFlash/$(1),$(1),microwrt
 ifeq ($(SUBTARGET),mt7620)
 define Image/Build/Profile/Default
 	$(call Image/Build/Profile/E1700,$(1))
+	$(call Image/Build/Profile/EX2700,$(1))
 	$(call Image/Build/Profile/MT7620a,$(1))
 	$(call Image/Build/Profile/MT7620a_MT7610e,$(1))
 	$(call Image/Build/Profile/MT7620a_MT7530,$(1))
@@ -919,18 +944,10 @@ define Image/Build/Profile/Default
 	$(call Image/Build/Profile/WRTNODE,$(1))
 	$(call Image/Build/Profile/WT3020,$(1))
 	$(call Image/Build/Profile/XIAOMI-MIWIFI-MINI,$(1))
-	$(call Image/Build/Profile/GL-MT300A,$(1))
-	$(call Image/Build/Profile/GL-MT300N,$(1))
-	$(call Image/Build/Profile/GL-MT750,$(1))
 	$(call Image/Build/Profile/ZTE-Q7,$(1))
 	$(call Image/Build/Profile/ZBT-WA05,$(1))
 	$(call Image/Build/Profile/ArcherC20i,$(1))
 	$(call Image/Build/Profile/MicroWRT,$(1))
-endef
-define Image/Build/Profile/GL-MT-ALL
-	$(call Image/Build/Profile/GL-MT300A,$(1))
-	$(call Image/Build/Profile/GL-MT300N,$(1))
-	$(call Image/Build/Profile/GL-MT750,$(1))
 endef
 endif
 

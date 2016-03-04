@@ -123,7 +123,7 @@ tplink_board_detect() {
 	"3C0002"*)
 		model="MINIBOX_V1"
 		;;
-	"070300"*)
+	"070301"*)
 		model="TP-Link TL-WR703N"
 		;;
 	"071000"*)
@@ -439,12 +439,6 @@ ar71xx_board_detect() {
 	*"Dragino v2")
 		name="dragino2"
 		;;
-	*"Domino Pi")
-		name="gl-domino"
-		;;
-	*"GL AR300")
-		name="gl-ar300"
-		;;
 	*"EAP300 v2")
 		name="eap300v2"
 		;;
@@ -461,9 +455,6 @@ ar71xx_board_detect() {
 		name="gl-inet"
 		gl_inet_board_detect
 		;;
-	*"GL AR150")
-        name="gl-ar150"
-        ;;
 	*"EnGenius EPG5000")
 		name="epg5000"
 		;;
@@ -808,6 +799,9 @@ ar71xx_board_detect() {
 		;;
 	*"TL-WR941N/ND v5")
 		name="tl-wr941nd-v5"
+		;;
+	*"TL-WR941N/ND v6")
+		name="tl-wr941nd-v6"
 		;;
 	*"TL-WR703N v1")
 		name="tl-wr703n"

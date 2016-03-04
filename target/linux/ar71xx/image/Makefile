@@ -144,30 +144,6 @@ define Device/weio
 endef
 TARGET_DEVICES += weio
 
-define Device/gl-ar150
-  BOARDNAME = GL-AR150
-  IMAGE_SIZE = 16000k
-  CONSOLE = ttyATH0,115200
-  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
-endef
-TARGET_DEVICES += gl-ar150
-
-define Device/gl-ar300
-  BOARDNAME = GL-AR300
-  IMAGE_SIZE = 16000k
-  CONSOLE = ttyS0,115200
-  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
-endef
-TARGET_DEVICES += gl-ar300
-
-define Device/gl-domino
-  BOARDNAME = DOMINO
-  IMAGE_SIZE = 16000k
-  CONSOLE = ttyATH0,115200
-  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
-endef
-TARGET_DEVICES += gl-domino
-
 define Device/wndr3700
   BOARDNAME = WNDR3700
   NETGEAR_KERNEL_MAGIC = 0x33373030
@@ -525,6 +501,14 @@ define Device/tl-wr740n-v4
     CONSOLE := ttyATH0,115200
 endef
 
+define Device/tl-wr740n-v5
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR741ND-v4
+    DEVICE_PROFILE := TLWR740
+    TPLINK_HWID := 0x07400005
+    CONSOLE := ttyATH0,115200
+endef
+
 define Device/tl-wr741nd-v1
     $(Device/tplink-4m)
     BOARDNAME := TL-WR741ND
@@ -547,6 +531,14 @@ define Device/tl-wr741nd-v4
     CONSOLE := ttyATH0,115200
 endef
 
+define Device/tl-wr741nd-v5
+    $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR741ND-v4
+    DEVICE_PROFILE := TLWR741
+    TPLINK_HWID := 0x07400005
+    CONSOLE := ttyATH0,115200
+endef
+
 define Device/tl-wr743nd-v2
     $(Device/tplink-4mlzma)
     BOARDNAME := TL-WR741ND-v4
@@ -554,7 +546,7 @@ define Device/tl-wr743nd-v2
     TPLINK_HWID := 0x07430002
     CONSOLE := ttyATH0,115200
 endef
-TARGET_DEVICES += tl-wr740n-v4 tl-wr741nd-v1 tl-wr741nd-v2 tl-wr741nd-v4 tl-wr743nd-v2
+TARGET_DEVICES += tl-wr740n-v4 tl-wr740n-v5 tl-wr741nd-v1 tl-wr741nd-v2 tl-wr741nd-v4 tl-wr741nd-v5 tl-wr743nd-v2
 
 define Device/tl-wr841n-v8
     $(Device/tplink-4mlzma)
@@ -608,11 +600,19 @@ endef
 
 define Device/tl-wr941nd-v6
     $(Device/tplink-4mlzma)
+    BOARDNAME := TL-WR941ND-v6
+    DEVICE_PROFILE := TLWR941
+    TPLINK_HWID := 0x09410006
+endef
+
+# Chinese version (unlike European) is similar to the TL-WDR3500
+define Device/tl-wr941nd-v6-cn
+    $(Device/tplink-4mlzma)
     BOARDNAME := TL-WDR3500
     DEVICE_PROFILE := TLWR941
     TPLINK_HWID := 0x09410006
 endef
-TARGET_DEVICES += tl-wr941nd-v5 tl-wr941nd-v6
+TARGET_DEVICES += tl-wr941nd-v5 tl-wr941nd-v6 tl-wr941nd-v6-cn
 
 define Device/tl-wr1041n-v2
     $(Device/tplink-4mlzma)
@@ -2031,6 +2031,7 @@ $(eval $(call SingleProfile,TPLINK,64kraw,TLWR941NV4,tl-wr941nd-v4,TL-WR741ND,tt
 $(eval $(call SingleProfile,TPLINK,64kraw,TLWR1043V1,tl-wr1043nd-v1,TL-WR1043ND,ttyS0,115200,0x10430001,1,8M))
 
 $(eval $(call SingleProfile,TPLINK-LZMA,64kraw,TLWR1043V2,tl-wr1043nd-v2,TL-WR1043ND-v2,ttyS0,115200,0x10430002,1,8M))
+$(eval $(call SingleProfile,TPLINK-LZMA,64kraw,TLWR1043V3,tl-wr1043nd-v3,TL-WR1043ND-v2,ttyS0,115200,0x10430003,1,8M))
 $(eval $(call SingleProfile,TPLINK-LZMA,64kraw,TLWR2543,tl-wr2543-v1,TL-WR2543N,ttyS0,115200,0x25430001,1,8Mlzma,-v 3.13.99))
 
 $(eval $(call SingleProfile,TPLINK-SAFELOADER,64kraw,CPE510,cpe210-220-510-520,CPE510,ttyS0,115200,$$(cpe510_mtdlayout),CPE510))
@@ -2038,7 +2039,7 @@ $(eval $(call SingleProfile,TPLINK-SAFELOADER,64kraw,CPE510,cpe210-220-510-520,C
 $(eval $(call SingleProfile,UAPPRO,64k,UAPPRO,ubnt-uap-pro,UAP-PRO,ttyS0,115200,BZ,BZ,ar934x))
 $(eval $(call SingleProfile,UAPPRO,64k,UBNTUNIFIOUTDOORPLUS,ubnt-unifi-outdoor-plus,UBNT-UOP,ttyS0,115200,BZ,BZ,ar7240))
 
-$(eval $(call SingleProfile,UBDEV,64kraw,UBDEV01,ubdev01,UBNT-UF,ttyS0,115200,XM,XM,ar7240))
+$(eval $(call SingleProfile,UBDEV,64kraw,UBDEV01,ubdev01,UBNT-UF,ttyS0,115200,UBDEV01,XM,ar7240))
 
 $(eval $(call SingleProfile,UBNT,64k,UBNTRS,ubnt-rs,UBNT-RS,ttyS0,115200,RS,RSx,ar7100))
 $(eval $(call SingleProfile,UBNT,64k,UBNTRSPRO,ubnt-rspro,UBNT-RSPRO,ttyS0,115200,RSPRO,RSPRO,ar7100pro))
@@ -2095,7 +2096,7 @@ $(eval $(call MultiProfile,TLWR743,TLWR743NV1))
 $(eval $(call MultiProfile,TLWR841,TLWR841NV15 TLWR841NV3 TLWR841NV5 TLWR841NV7))
 $(eval $(call MultiProfile,TLWR842,TLWR842V1))
 $(eval $(call MultiProfile,TLWR941,TLWR941NV2 TLWR941NV3 TLWR941NV4))
-$(eval $(call MultiProfile,TLWR1043,TLWR1043V1 TLWR1043V2))
+$(eval $(call MultiProfile,TLWR1043,TLWR1043V1 TLWR1043V2 TLWR1043V3))
 $(eval $(call MultiProfile,TLWDR4300,TLWDR3500V1 TLWDR3600V1 TLWDR4300V1 TLWDR4300V1IL TLWDR4310V1 MW4530RV1))
 $(eval $(call MultiProfile,TUBE2H,TUBE2H8M TUBE2H16M))
 $(eval $(call MultiProfile,UBNT,UBNTAIRROUTER UBNTRS UBNTRSPRO UBNTLSSR71 UBNTBULLETM UBNTROCKETM UBNTROCKETMXW UBNTNANOM UBNTNANOMXW UBNTLOCOXW UBNTUNIFI UBNTUNIFIOUTDOOR UBNTUNIFIOUTDOORPLUS UAPPRO UBNTAIRGW))
