@@ -20,7 +20,7 @@
 +	*"Domino Pi")
 +		name="gl-domino"
 +		;;
- 	*"GL AR300")
+ 	*"GL-AR300")
  		name="gl-ar300"
  		;;
 --- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh

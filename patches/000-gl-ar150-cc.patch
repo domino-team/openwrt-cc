@@ -4,7 +4,7 @@
  		name="gl-inet"
  		gl_inet_board_detect
  		;;
-+	*"GL AR150")
++	*"GL-AR150")
 +        name="gl-ar150"
 +        ;;
  	*"EnGenius EPG5000")
@@ -137,7 +137,7 @@
 +	ath79_register_wmac(art + GL_AR150_CALDATA_OFFSET, art + GL_AR150_WMAC_MAC_OFFSET);
 +}
 +
-+MIPS_MACHINE(ATH79_MACH_GL_AR150, "GL-AR150", "GL AR150",gl_ar150_setup);
++MIPS_MACHINE(ATH79_MACH_GL_AR150, "GL-AR150", "GL-AR150",gl_ar150_setup);
 --- /dev/null
 +++ b/target/linux/ar71xx/generic/profiles/gli.mk
 @@ -0,0 +1,27 @@
@@ -159,12 +159,12 @@
 +$(eval $(call Profile,GLINET))
 +
 +define Profile/GL-AR150
-+	NAME:=GL AR150
++	NAME:=GL-AR150
 +	PACKAGES:=kmod-usb-core kmod-usb2
 +endef
 +
 +define Profile/GL-AR150/Description
-+	Configuration of GL AR150.
++	Configuration of GL-AR150.
 +endef
 +
 +$(eval $(call Profile,GL-AR150))
