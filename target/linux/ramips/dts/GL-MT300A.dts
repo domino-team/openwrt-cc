@@ -107,7 +107,7 @@
 	pinctrl {
 		state_default: pinctrl0 {
 			gpio {
-				ralink,group = "wled","ephy","uartf";
+				ralink,group = "wled","ephy","uartf","i2c";
 				ralink,function = "gpio";
 			};
 		};
@@ -131,6 +131,11 @@
 			gpios = <&gpio3 0 1>;
 		};
 
+		usb {
+			label = "gl-mt300a:usb";
+			gpios = <&gpio0 7 1>;
+		}
+
 	};
 
 	gpio-keys-polled {
@@ -146,13 +151,13 @@
 
 		BTN_0 {
 			label = "BTN_0";
-			gpios = <&gpio2 2 1>;
+			gpios = <&gpio0 1 1>;
 			linux,code = <0x100>;
 		};
 
   	    BTN_1 {
 			label = "BTN_1";
-			gpios = <&gpio2 3 1>;
+			gpios = <&gpio0 2 1>;
 			linux,code = <0x101>;
 		};
  	};
