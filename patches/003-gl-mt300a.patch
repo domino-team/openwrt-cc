@@ -196,7 +196,7 @@
 +		usb {
 +			label = "gl-mt300a:usb";
 +			gpios = <&gpio0 7 1>;
-+		}
++		};
 +
 +	};
 +
