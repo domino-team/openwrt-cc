@@ -18,7 +18,7 @@ $ git clone https://github.com/domino-team/openwrt-cc.git
 $ cd openwrt-cc
 $ ./scripts/feeds update -a
 $ ./scripts/feeds install -a
-$ make meunconfig
+$ make menuconfig
   ..choose your compile target and packages
 $ make
 ```
