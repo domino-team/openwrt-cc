@@ -59,7 +59,7 @@
  	$(call Image/Build/Profile/ArcherC20i,$(1))
 --- /dev/null
 +++ b/target/linux/ramips/dts/GL-MT300A.dts
-@@ -0,0 +1,164 @@
+@@ -0,0 +1,163 @@
 +/dts-v1/;
 +
 +/include/ "mt7620a.dtsi"
@@ -103,18 +103,17 @@
 +				partition@0 {
 +					label = "u-boot";
 +					reg = <0x0 0x30000>;
++					read-only;
 +				};
 +
 +				partition@30000 {
 +					label = "u-boot-env";
 +					reg = <0x30000 0x10000>;
-+					read-only;
 +				};
 +
 +				factory: partition@40000 {
 +					label = "factory";
 +					reg = <0x40000 0x10000>;
-+					read-only;
 +				};
 +
 +				partition@50000 {
