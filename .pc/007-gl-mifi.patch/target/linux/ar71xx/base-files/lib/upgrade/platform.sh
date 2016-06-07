@@ -212,7 +212,6 @@ platform_check_image() {
 	dlan-pro-1200-ac | \
 	dragino2 | \
 	gl-ar150 | \
-	gl-mifi | \
 	gl-ar300 | \
 	gl-domino | \
 	epg5000 | \
