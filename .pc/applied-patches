@@ -6,3 +6,4 @@
 005-gl-mt750.patch
 006-gl-mt-all.patch
 007-gl-mifi.patch
+100-gl-mifi-driver.patch
