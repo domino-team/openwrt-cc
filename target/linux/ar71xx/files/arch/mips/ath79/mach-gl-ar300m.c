@@ -27,13 +27,13 @@
 #include "machtypes.h"
 #include "pci.h"
 
-#define GL_AR300M_GPIO_LED_USB      2
-#define GL_AR300M_GPIO_LED_WLAN     14
-#define GL_AR300M_GPIO_LED_LAN      3
-#define GL_AR300M_GPIO_LED_SYSTEM   2
-#define GL_AR300M_GPIO_BTN_RESET    3
-#define GL_AR300M_GPIO_BTN_LEFT     0
-#define GL_AR300M_GPIO_BTN_RIGHT    1
+#define GL_AR300M_GPIO_LED_USB		2
+#define GL_AR300M_GPIO_LED_WLAN		14
+#define GL_AR300M_GPIO_LED_LAN		13
+#define GL_AR300M_GPIO_LED_SYSTEM	12
+#define GL_AR300M_GPIO_BTN_RESET	3
+#define GL_AR300M_GPIO_BTN_LEFT		0
+#define GL_AR300M_GPIO_BTN_RIGHT	1
 
 #define GL_AR300M_KEYS_POLL_INTERVAL        20  /* msecs */
 #define GL_AR300M_KEYS_DEBOUNCE_INTERVAL    (3 * GL_AR300M_KEYS_POLL_INTERVAL)
@@ -58,7 +58,6 @@ static struct gpio_led gl_ar300m_leds_gpio[] __initdata = {
         .name = "gl-ar300m:lan",
         .gpio = GL_AR300M_GPIO_LED_LAN,
         .active_low = 1,
-        .default_state = 1,
     },
     {
         .name = "gl-ar300m:system",
