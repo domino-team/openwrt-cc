@@ -185,9 +185,6 @@ gl-ar150)
 	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
 	;;
 
-gl-ar300m)
-	ucidef_set_led_wlan "wlan" "WLAN" "gl-ar300m:wlan" "phy0tpt"
-
 gl-mifi)
 	ucidef_set_led_netdev "wan" "WAN" "gl_mifi:wan" "eth0"
 	ucidef_set_led_netdev "lan" "LAN" "gl_mifi:lan" "eth1"

@@ -214,7 +214,6 @@ platform_check_image() {
 	gl-ar150 | \
 	gl-mifi | \
 	gl-ar300 | \
-	gl-ar300m | \
 	gl-domino | \
 	epg5000 | \
 	esr1750 | \

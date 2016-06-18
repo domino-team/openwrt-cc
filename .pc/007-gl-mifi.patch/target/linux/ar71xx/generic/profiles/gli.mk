@@ -47,22 +47,3 @@ define Profile/DOMINO/Description
 endef
 
 $(eval $(call Profile,DOMINO))
-
-define Profile/GL-MIFI
-	NAME:=GL-MIFI
-	PACKAGES:=kmod-usb-core kmod-usb2
-endef
-define Profile/GL-MIFI/Description
-	Configuration of GL-MIFI.
-endef
-$(eval $(call Profile,GL-MIFI))
-
-define Profile/GL-AR300M
-	NAME:=GL-AR300M
-	PACKAGES:= kmod-usb-core kmod-usb2 mod-usb-storage kmod-ledtrig-usbdev kmod-ledtrig-gpio
-endef
-
-define Profile/GL-AR300M/description
-	Package set optimized for the GL-AR300M.
-endef
-$(eval $(call Profile,GL-AR300M))

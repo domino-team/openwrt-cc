@@ -1,0 +1,312 @@
+--- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
++++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
+@@ -185,6 +185,9 @@ gl-ar150)
+ 	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
+ 	;;
+ 
++gl-ar300m)
++	ucidef_set_led_wlan "wlan" "WLAN" "gl-ar300m:wlan" "phy0tpt"
++
+ gl-mifi)
+ 	ucidef_set_led_netdev "wan" "WAN" "gl_mifi:wan" "eth0"
+ 	ucidef_set_led_netdev "lan" "LAN" "gl_mifi:lan" "eth1"
+--- a/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
++++ b/target/linux/ar71xx/base-files/etc/uci-defaults/02_network
+@@ -377,6 +377,7 @@ alfa-ap96 |\
+ alfa-nx |\
+ ap83 |\
+ gl-ar150 |\
++gl-ar300m |\
+ gl-mifi |\
+ gl-domino |\
+ gl-inet |\
+--- /dev/null
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-ar300m.c
+@@ -0,0 +1,179 @@
++/*
++ *  GLI AR300M(D) board support
++ *
++ *  Copyright (C) 2011 dongyuqi <729650915@qq.com>
++ *  Copyright (C) 2011-2012 Gabor Juhos <juhosg@openwrt.org>
++ *  Copyright (C) 2013 alzhao <alzhao@gmail.com>
++ *  Copyright (C) 2014 Michel Stempin <michel.stempin@wanadoo.fr>
++ *
++ *  This program is free software; you can redistribute it and/or modify it
++ *  under the terms of the GNU General Public License version 2 as published
++ *  by the Free Software Foundation.
++ */
++
++#include <linux/gpio.h>
++#include <linux/pci.h>
++
++#include <asm/mach-ath79/ath79.h>
++
++#include "dev-ap9x-pci.h"
++#include "dev-eth.h"
++#include "dev-gpio-buttons.h"
++#include "dev-leds-gpio.h"
++#include "dev-m25p80.h"
++#include "dev-usb.h"
++#include "dev-spi.h"
++#include "dev-wmac.h"
++#include "machtypes.h"
++#include "pci.h"
++
++#define GL_AR300M_GPIO_LED_USB      2
++#define GL_AR300M_GPIO_LED_WLAN     14
++#define GL_AR300M_GPIO_LED_LAN      3
++#define GL_AR300M_GPIO_LED_SYSTEM   2
++#define GL_AR300M_GPIO_BTN_RESET    3
++#define GL_AR300M_GPIO_BTN_LEFT     0
++#define GL_AR300M_GPIO_BTN_RIGHT    1
++
++#define GL_AR300M_KEYS_POLL_INTERVAL        20  /* msecs */
++#define GL_AR300M_KEYS_DEBOUNCE_INTERVAL    (3 * GL_AR300M_KEYS_POLL_INTERVAL)
++
++#define GL_AR300M_MAC0_OFFSET   0
++#define GL_AR300M_MAC1_OFFSET   6
++#define GL_AR300M_WMAC_CALDATA_OFFSET   0x1000
++#define GL_AR300M_PCIE_CALDATA_OFFSET   0x5000
++
++static struct gpio_led gl_ar300m_leds_gpio[] __initdata = {
++    {
++        .name = "gl-ar300m:usb",
++        .gpio = GL_AR300M_GPIO_LED_USB,
++        .active_low = 0,
++    },
++    {
++        .name = "gl-ar300m:wlan",
++        .gpio = GL_AR300M_GPIO_LED_WLAN,
++        .active_low = 1,
++    },
++    {
++        .name = "gl-ar300m:lan",
++        .gpio = GL_AR300M_GPIO_LED_LAN,
++        .active_low = 1,
++        .default_state = 1,
++    },
++    {
++        .name = "gl-ar300m:system",
++        .gpio = GL_AR300M_GPIO_LED_SYSTEM,
++        .active_low = 1,
++        .default_state = 1,
++    },
++};
++
++static struct gpio_keys_button gl_ar300m_gpio_keys[] __initdata = {
++    {
++        .desc = "reset",
++        .type = EV_KEY,
++        .code = KEY_RESTART,
++        .debounce_interval = GL_AR300M_KEYS_DEBOUNCE_INTERVAL,
++        .gpio = GL_AR300M_GPIO_BTN_RESET,
++        .active_low = 1,
++    },
++    {
++        .desc = "button right",
++        .type = EV_KEY,
++        .code = BTN_0,
++        .debounce_interval = GL_AR300M_KEYS_DEBOUNCE_INTERVAL,
++        .gpio = GL_AR300M_GPIO_BTN_LEFT,
++        .active_low = 0,
++    },
++    {
++        .desc = "button left",
++        .type = EV_KEY,
++        .code = BTN_1,
++        .debounce_interval = GL_AR300M_KEYS_DEBOUNCE_INTERVAL,
++        .gpio = GL_AR300M_GPIO_BTN_RIGHT,
++        .active_low = 0,
++    },
++};
++
++static struct ath79_spi_controller_data gl_ar300m_spi0_cdata =
++{
++    .cs_type    = ATH79_SPI_CS_TYPE_INTERNAL,
++    .is_flash   = true,
++    .cs_line    = 0,
++};
++
++static struct ath79_spi_controller_data gl_ar300m_spi1_cdata =
++{
++    .cs_type    = ATH79_SPI_CS_TYPE_INTERNAL,
++    .is_flash   = false,
++    .cs_line    = 1,
++};
++
++static struct spi_board_info gl_ar300m_spi_info[] = {
++    {
++        .bus_num    = 0,
++        .chip_select    = 0,
++        .max_speed_hz   = 25000000,
++        .modalias   = "m25p80",
++        .controller_data = &gl_ar300m_spi0_cdata,
++        .platform_data  = NULL,
++    },
++    {
++        .bus_num    = 0,
++        .chip_select    = 1,
++        .max_speed_hz   = 25000000,
++        .modalias   = "ath79-spinand",
++        .controller_data = &gl_ar300m_spi1_cdata,
++        .platform_data  = NULL,
++    }
++};
++
++static struct ath79_spi_platform_data gl_ar300m_spi_data = {
++    .bus_num        = 0,
++    .num_chipselect     = 2,
++};
++
++static void __init gl_ar300m_setup(void)
++{
++    u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
++    u8 tmpmac[ETH_ALEN];
++
++    ath79_register_spi(&gl_ar300m_spi_data, gl_ar300m_spi_info, 2);
++
++    /* register gpio LEDs and keys */
++    ath79_register_leds_gpio(-1, ARRAY_SIZE(gl_ar300m_leds_gpio),
++                 gl_ar300m_leds_gpio);
++    ath79_register_gpio_keys_polled(-1, GL_AR300M_KEYS_POLL_INTERVAL,
++                    ARRAY_SIZE(gl_ar300m_gpio_keys),
++                    gl_ar300m_gpio_keys);
++
++    ath79_register_mdio(0, 0x0);
++
++    /* WAN */
++    ath79_init_mac(ath79_eth0_data.mac_addr, art + GL_AR300M_MAC0_OFFSET, 0);
++    ath79_eth0_data.phy_if_mode = PHY_INTERFACE_MODE_MII;
++    ath79_eth0_data.speed = SPEED_100;
++    ath79_eth0_data.duplex = DUPLEX_FULL;
++    ath79_eth0_data.phy_mask = BIT(4);
++    ath79_register_eth(0);
++
++    /* LAN */
++    ath79_init_mac(ath79_eth1_data.mac_addr, art + GL_AR300M_MAC1_OFFSET, 0);
++    ath79_eth1_data.phy_if_mode = PHY_INTERFACE_MODE_GMII;
++    ath79_eth1_data.speed = SPEED_1000;
++    ath79_eth1_data.duplex = DUPLEX_FULL;
++    ath79_switch_data.phy_poll_mask |= BIT(4);
++    ath79_switch_data.phy4_mii_en = 1;
++    ath79_register_eth(1);
++
++    ath79_init_mac(tmpmac, art + GL_AR300M_WMAC_CALDATA_OFFSET + 2, 0);
++    ath79_register_wmac(art + GL_AR300M_WMAC_CALDATA_OFFSET, tmpmac);
++
++    /* enable usb */
++    ath79_register_usb();
++    /* enable pci */
++    ath79_register_pci();
++}
++
++MIPS_MACHINE(ATH79_MACH_GL_AR300M, "GL-AR300M", "GL-AR300M",
++         gl_ar300m_setup);
+--- a/target/linux/ar71xx/image/Makefile
++++ b/target/linux/ar71xx/image/Makefile
+@@ -168,6 +168,15 @@ define Device/gl-ar300
+ endef
+ TARGET_DEVICES += gl-ar300
+ 
++define Device/gl-ar300m
++  BOARDNAME = GL-AR300M
++  IMAGE_SIZE = 16000k
++  CONSOLE = ttyS0,115200
++  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
++endef
++TARGET_DEVICES += gl-ar300m
++
++
+ define Device/gl-domino
+   BOARDNAME = DOMINO
+   IMAGE_SIZE = 16000k
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -71,6 +71,7 @@ CONFIG_ATH79_MACH_F9K1115V2=y
+ CONFIG_ATH79_MACH_GL_AR150=y
+ CONFIG_ATH79_MACH_GL_MIFI=y
+ CONFIG_ATH79_MACH_GL_AR300=y
++CONFIG_ATH79_MACH_GL_AR300M=y
+ CONFIG_ATH79_MACH_GL_DOMINO=y
+ CONFIG_ATH79_MACH_GL_INET=y
+ CONFIG_ATH79_MACH_GS_MINIBOX_V1=y
+--- a/target/linux/ar71xx/base-files/lib/ar71xx.sh
++++ b/target/linux/ar71xx/base-files/lib/ar71xx.sh
+@@ -464,6 +464,9 @@ ar71xx_board_detect() {
+ 	*"GL-AR150")
+         name="gl-ar150"
+         ;;
++	*"GL-AR300M")
++		name="gl-ar300m"
++		;;
+ 	*"GL-MIFI")
+         name="gl-mifi"
+         ;;
+--- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
+@@ -214,6 +214,7 @@ platform_check_image() {
+ 	gl-ar150 | \
+ 	gl-mifi | \
+ 	gl-ar300 | \
++	gl-ar300m | \
+ 	gl-domino | \
+ 	epg5000 | \
+ 	esr1750 | \
+--- a/target/linux/ar71xx/generic/profiles/gli.mk
++++ b/target/linux/ar71xx/generic/profiles/gli.mk
+@@ -56,3 +56,13 @@ define Profile/GL-MIFI/Description
+ 	Configuration of GL-MIFI.
+ endef
+ $(eval $(call Profile,GL-MIFI))
++
++define Profile/GL-AR300M
++	NAME:=GL-AR300M
++	PACKAGES:= kmod-usb-core kmod-usb2 mod-usb-storage kmod-ledtrig-usbdev kmod-ledtrig-gpio
++endef
++
++define Profile/GL-AR300M/description
++	Package set optimized for the GL-AR300M.
++endef
++$(eval $(call Profile,GL-AR300M))
+--- /dev/null
++++ b/target/linux/ar71xx/patches-3.18/917-MIPS-ath79-add-gl_ar300m.patch
+@@ -0,0 +1,39 @@
++--- a/arch/mips/ath79/Kconfig
+++++ b/arch/mips/ath79/Kconfig
++@@ -563,6 +563,16 @@ config ATH79_MACH_GL_AR300
++    select ATH79_DEV_USB
++    select ATH79_DEV_WMAC
++ 
+++config ATH79_MACH_GL_AR300M
+++   bool "GL_AR300M support"
+++   select SOC_AR953X
+++   select ATH79_DEV_ETH
+++   select ATH79_DEV_GPIO_BUTTONS
+++   select ATH79_DEV_LEDS_GPIO
+++   select ATH79_DEV_M25P80
+++   select ATH79_DEV_USB
+++   select ATH79_DEV_WMAC
+++
++ config ATH79_MACH_GL_DOMINO
++    bool "DOMINO support"
++    select SOC_AR933X
++--- a/arch/mips/ath79/Makefile
+++++ b/arch/mips/ath79/Makefile
++@@ -81,6 +81,7 @@ obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= ma
++ obj-$(CONFIG_ATH79_MACH_GL_AR150)	+= mach-gl-ar150.o
++ obj-$(CONFIG_ATH79_MACH_GL_MIFI)	+= mach-gl-mifi.o
++ obj-$(CONFIG_ATH79_MACH_GL_AR300)	+= mach-gl-ar300.o
+++obj-$(CONFIG_ATH79_MACH_GL_AR300M)    += mach-gl-ar300m.o
++ obj-$(CONFIG_ATH79_MACH_GL_DOMINO)	+= mach-gl-domino.o
++ obj-$(CONFIG_ATH79_MACH_GL_INET)	+= mach-gl-inet.o
++ obj-$(CONFIG_ATH79_MACH_GS_MINIBOX_V1)	+= mach-gs-minibox-v1.o
++--- a/arch/mips/ath79/machtypes.h
+++++ b/arch/mips/ath79/machtypes.h
++@@ -70,6 +70,7 @@ enum ath79_mach_type {
++ 	ATH79_MACH_GL_AR150,	/* GL-AR150 support */
++ 	ATH79_MACH_GL_MIFI,	    /* GL-MIFI support */
++ 	ATH79_MACH_GL_AR300,		/* GL-AR300 */
+++	ATH79_MACH_GL_AR300M,		/* GL-AR300M */
++ 	ATH79_MACH_GL_DOMINO,		/* Domino */
++ 	ATH79_MACH_GL_INET,		/* GL-CONNECT GL-INET */
++ 	ATH79_MACH_GS_MINIBOX_V1,	/* Gainstrong MiniBox V1.0 */
