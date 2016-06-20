@@ -1,0 +1,200 @@
+--- a/target/linux/ar71xx/config-3.18
++++ b/target/linux/ar71xx/config-3.18
+@@ -189,6 +189,10 @@ CONFIG_CPU_R4K_FPU=y
+ CONFIG_CPU_SUPPORTS_32BIT_KERNEL=y
+ CONFIG_CPU_SUPPORTS_HIGHMEM=y
+ CONFIG_CPU_SUPPORTS_MSA=y
++CONFIG_CRC16=y
++CONFIG_CRYPTO_DEFLATE=y
++CONFIG_CRYPTO_LZO=y
++CONFIG_CRYPTO_XZ=y
+ CONFIG_CSRC_R4K=y
+ CONFIG_DMA_NONCOHERENT=y
+ CONFIG_EARLY_PRINTK=y
+@@ -258,6 +262,8 @@ CONFIG_IRQ_FORCED_THREADING=y
+ CONFIG_IRQ_WORK=y
+ CONFIG_LEDS_GPIO=y
+ # CONFIG_LEDS_WNDR3700_USB is not set
++CONFIG_LZO_COMPRESS=y
++CONFIG_LZO_DECOMPRESS=y
+ CONFIG_MARVELL_PHY=y
+ CONFIG_MDIO_BOARDINFO=y
+ CONFIG_MICREL_PHY=y
+@@ -276,6 +282,9 @@ CONFIG_MTD_M25P80=y
+ # CONFIG_MTD_MAP_BANK_WIDTH_1 is not set
+ # CONFIG_MTD_MAP_BANK_WIDTH_4 is not set
+ CONFIG_MTD_MYLOADER_PARTS=y
++CONFIG_MTD_NAND=y
++CONFIG_MTD_NAND_ATH79=y
++CONFIG_MTD_NAND_ECC=y
+ CONFIG_MTD_PHYSMAP=y
+ CONFIG_MTD_REDBOOT_DIRECTORY_BLOCK=-2
+ CONFIG_MTD_REDBOOT_PARTS=y
+@@ -285,6 +294,12 @@ CONFIG_MTD_SPLIT_LZMA_FW=y
+ CONFIG_MTD_SPLIT_SEAMA_FW=y
+ CONFIG_MTD_SPLIT_UIMAGE_FW=y
+ CONFIG_MTD_TPLINK_PARTS=y
++CONFIG_MTD_UBI=y
++CONFIG_MTD_UBI_BEB_LIMIT=20
++# CONFIG_MTD_UBI_BLOCK is not set
++# CONFIG_MTD_UBI_FASTMAP is not set
++# CONFIG_MTD_UBI_GLUEBI is not set
++CONFIG_MTD_UBI_WL_THRESHOLD=4096
+ CONFIG_MYLOADER=y
+ CONFIG_NEED_DMA_MAP_STATE=y
+ CONFIG_NEED_PER_CPU_KM=y
+@@ -339,5 +354,12 @@ CONFIG_SYS_SUPPORTS_ARBIT_HZ=y
+ CONFIG_SYS_SUPPORTS_BIG_ENDIAN=y
+ CONFIG_SYS_SUPPORTS_MIPS16=y
+ CONFIG_TICK_CPU_ACCOUNTING=y
++CONFIG_UBIFS_FS=y
++CONFIG_UBIFS_FS_ADVANCED_COMPR=y
++CONFIG_UBIFS_FS_LZO=y
++CONFIG_UBIFS_FS_XZ=y
++CONFIG_UBIFS_FS_ZLIB=y
+ CONFIG_USB_SUPPORT=y
++CONFIG_ZLIB_DEFLATE=y
++CONFIG_ZLIB_INFLATE=y
+ CONFIG_ZONE_DMA_FLAG=0
+--- /dev/null
++++ b/target/linux/ar71xx/patches-3.18/908-MIPS-ath79-add-spi-nand-driver.patch
+@@ -0,0 +1,52 @@
++Index: linux-3.18.23/drivers/mtd/nand/Kconfig
++===================================================================
++--- linux-3.18.23.orig/drivers/mtd/nand/Kconfig
+++++ linux-3.18.23/drivers/mtd/nand/Kconfig
++@@ -536,4 +536,12 @@ config MTD_NAND_AR934X_HW_ECC
++ 	bool "Hardware ECC support for the AR934X NAND Controller (EXPERIMENTAL)"
++ 	depends on MTD_NAND_AR934X
++ 
+++config MTD_NAND_ATH79
+++      tristate "Nand flash support for Qualcomm-Atheros SoCs 71xx & 9xxx"
+++      default n
+++      depends on MTD_NAND && (SOC_AR724X || SOC_AR934X || SOC_QCA953X)
+++      help
+++        Enables the driver for NAND flash controller on Qualcomm-Atheros System on Chips
+++        This controller is used on families AR71xx and AR9xxx.
+++
++ endif # MTD_NAND
++Index: linux-3.18.23/drivers/mtd/nand/Makefile
++===================================================================
++--- linux-3.18.23.orig/drivers/mtd/nand/Makefile
+++++ linux-3.18.23/drivers/mtd/nand/Makefile
++@@ -54,5 +54,6 @@ obj-$(CONFIG_MTD_NAND_JZ4740)		+= jz4740
++ obj-$(CONFIG_MTD_NAND_GPMI_NAND)	+= gpmi-nand/
++ obj-$(CONFIG_MTD_NAND_XWAY)		+= xway_nand.o
++ obj-$(CONFIG_MTD_NAND_BCM47XXNFLASH)	+= bcm47xxnflash/
+++obj-$(CONFIG_MTD_NAND_ATH79)		+= ath79_spinand.o
++ 
++ nand-objs := nand_base.o nand_bbt.o nand_timings.o
++Index: linux-3.18.23/drivers/mtd/nand/nand_ids.c
++===================================================================
++--- linux-3.18.23.orig/drivers/mtd/nand/nand_ids.c
+++++ linux-3.18.23/drivers/mtd/nand/nand_ids.c
++@@ -178,6 +178,7 @@ struct nand_manufacturers nand_manuf_ids
++ 	{NAND_MFR_EON, "Eon"},
++ 	{NAND_MFR_SANDISK, "SanDisk"},
++ 	{NAND_MFR_INTEL, "Intel"},
+++	{NAND_MFR_GIGADEVICE, "Giga Device"},
++ 	{0x0, "Unknown"}
++ };
++ 
++Index: linux-3.18.23/include/linux/mtd/nand.h
++===================================================================
++--- linux-3.18.23.orig/include/linux/mtd/nand.h
+++++ linux-3.18.23/include/linux/mtd/nand.h
++@@ -720,6 +720,7 @@ struct nand_chip {
++ #define NAND_MFR_MICRON		0x2c
++ #define NAND_MFR_AMD		0x01
++ #define NAND_MFR_MACRONIX	0xc2
+++#define NAND_MFR_GIGADEVICE	0xc8
++ #define NAND_MFR_EON		0x92
++ #define NAND_MFR_SANDISK	0x45
++ #define NAND_MFR_INTEL		0x89
+--- a/package/utils/ubi-utils/Makefile
++++ b/package/utils/ubi-utils/Makefile
+@@ -35,7 +35,7 @@ define Package/ubi-utils
+   SECTION:=utils
+   CATEGORY:=Utilities
+   URL:=http://www.linux-mtd.infradead.org/
+-  DEPENDS:=@NAND_SUPPORT
++#  DEPENDS:=@NAND_SUPPORT
+ endef
+ 
+ define Package/ubi-utils/description
+--- a/target/linux/ar71xx/generic/profiles/gli.mk
++++ b/target/linux/ar71xx/generic/profiles/gli.mk
+@@ -59,7 +59,7 @@ $(eval $(call Profile,GL-MIFI))
+ 
+ define Profile/GL-AR300M
+ 	NAME:=GL-AR300M
+-	PACKAGES:= kmod-usb-core kmod-usb2 mod-usb-storage kmod-ledtrig-usbdev kmod-ledtrig-gpio
++	PACKAGES:= kmod-usb-core kmod-usb2 mod-usb-storage kmod-ledtrig-usbdev kmod-ledtrig-gpio ubi-utils
+ endef
+ 
+ define Profile/GL-AR300M/description
+--- a/package/base-files/files/lib/upgrade/common.sh
++++ b/package/base-files/files/lib/upgrade/common.sh
+@@ -219,7 +219,8 @@ jffs2_copy_config() {
+ default_do_upgrade() {
+ 	sync
+ 	if [ "$SAVE_CONFIG" -eq 1 ]; then
+-		get_image "$1" "$2" | mtd $MTD_CONFIG_ARGS -j "$CONF_TAR" write - "${PART_NAME:-image}"
++		# get_image "$1" "$2" | mtd $MTD_CONFIG_ARGS -j "$CONF_TAR" write - "${PART_NAME:-image}"
++		get_image "$1" "$2" | mtd write - "${PART_NAME:-image}"
+ 	else
+ 		get_image "$1" "$2" | mtd write - "${PART_NAME:-image}"
+ 	fi
+--- a/package/base-files/files/sbin/sysupgrade
++++ b/package/base-files/files/sbin/sysupgrade
+@@ -226,6 +226,11 @@ fi
+ ubus call system upgrade
+ touch /tmp/sysupgrade
+ 
++if [ "$SAVE_CONFIG" -eq 0 ]; then
++	# clear overlay filesystem on nand flash
++	jffs2reset -y
++fi
++
+ if [ ! -f /tmp/failsafe ] ; then
+ 	kill_remaining TERM
+ 	sleep 3
+--- /dev/null
++++ b/target/linux/ar71xx/base-files/etc/init.d/init-nand-flash
+@@ -0,0 +1,36 @@
++#!/bin/sh /etc/rc.common
++
++START=99
++STOP=10
++
++board_name=`cat /tmp/sysinfo/board_name`
++nand_flash_dev=`awk -F':' '/ubi/ {print $1}' /proc/mtd`
++
++ubi_check_dev () {
++    hexdump -C /dev/$nand_flash_dev -n 8 2>/dev/null | grep -q 'UBI#' 2>/dev/null
++    local is_ubi=$?
++    grep -q ubifs /proc/mounts
++    local is_mounted=$?
++    if [ ! $is_ubi -eq 0 ] || [ ! $is_mounted -eq 0 ]; then
++        echo 1
++    else
++        echo 0
++    fi
++}
++
++ubi_init_flash () {
++    ubiformat -q -y /dev/$nand_flash_dev -s 2048 && \
++        ubiattach /dev/ubi_ctrl -p /dev/$nand_flash_dev && \
++        ubimkvol /dev/ubi0 -N rootfs_data -s 110MiB && \
++        sync
++}
++
++start () {
++    [ $board_name == "gl-ar300m" ] || return 0
++
++    ret=$(ubi_check_dev)
++    if [ ! $ret == "0" ]; then
++        ubi_init_flash
++        reboot
++    fi
++}
