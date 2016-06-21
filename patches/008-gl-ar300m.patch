@@ -1,11 +1,12 @@
 --- a/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
 +++ b/target/linux/ar71xx/base-files/etc/uci-defaults/01_leds
-@@ -185,6 +185,9 @@ gl-ar150)
+@@ -185,6 +185,10 @@ gl-ar150)
  	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
  	;;
  
 +gl-ar300m)
 +	ucidef_set_led_wlan "wlan" "WLAN" "gl-ar300m:wlan" "phy0tpt"
++	;;
 +
  gl-mifi)
  	ucidef_set_led_netdev "wan" "WAN" "gl_mifi:wan" "eth0"
