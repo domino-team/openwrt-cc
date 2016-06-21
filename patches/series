@@ -8,3 +8,6 @@
 007-gl-mifi.patch
 008-gl-ar300m.patch
 100-gl-mifi-driver.patch
+#101-ar71xx-add-nand-flash-driver.patch
+#102-gl-ar300m-build-overlay-on-nand.patch
+
