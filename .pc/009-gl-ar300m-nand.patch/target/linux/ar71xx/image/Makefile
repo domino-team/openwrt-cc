@@ -1078,7 +1078,6 @@ mynet_n600_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,64k(devdat
 mynet_rext_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,7808k(firmware),64k(nvram)ro,64k(ART)ro
 zyx_nbg6716_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,64k(env)ro,64k(RFdata)ro,-(nbu);ar934x-nfc:2048k(zyxel_rfsd),2048k(romd),1024k(header),2048k(kernel),-(ubi)
 qihoo_c301_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,64k(u-boot-env),64k(devdata),64k(devconf),15744k(firmware),64k(warm_start),64k(action_image_config),64k(radiocfg)ro;spi0.1:15360k(upgrade2),1024k(privatedata)
-gl-ar300m-nand_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,64k(u-boot-env),16000k(reserved),64k(art);spi0.1:2048k(kernel),-(ubi)
 
 
 define Image/BuildKernel
@@ -1852,34 +1851,6 @@ define Image/Build/ZyXELNAND
 	$(call Image/Build/SysupgradeNAND,$(2),squashfs,$(KDIR_TMP)/$(2)-kernel.jffs2)
 endef
 
-Image/Build/GLNAND/initramfs=$(call MkuImageLzma/initramfs,$(2),$(3) $(4))
-
-Image/Build/GLNAND/buildkernel=$(call MkuImageLzma,$(2),$(3) $(4))
-
-# $(1): rootfs image suffix
-# $(2): Board name (small caps)
-# $(3): Kernel board specific cmdline
-# $(4): Kernel mtdparts definition
-# $(5): suffix of the configuration file for ubinize
-define Image/Build/GLNAND
-	$(eval kernelsize=$(call mtdpartsize,kernel,$(4)))
-	$(CP) $(KDIR)/root.squashfs-raw $(KDIR_TMP)/root.squashfs
-	echo -ne '\xde\xad\xc0\xde' > $(KDIR_TMP)/jffs2.eof
-	$(call ubinize,ubinize-$(5).ini,$(KDIR_TMP),$(KDIR_TMP)/$(2)-root.ubi,128KiB,2048,)
-
-	( \
-		dd if=$(KDIR_TMP)/vmlinux-$(2).uImage \
-			of=$(call imgname,kernel,$(2)).bin conv=sync; \
-		dd if=$(KDIR_TMP)/$(2)-root.ubi \
-			of=$(call imgname,$(1),$(2)-rootfs).ubi bs=128k conv=sync; \
-	)
-	( \
-		dd if=$(call imgname,kernel,$(2)).bin bs=$(kernelsize) conv=sync; \
-		dd if=$(call imgname,$(1),$(2)-rootfs).ubi \
-	) > $(call imgname,ubi,$(2)).img
-
-	$(call Image/Build/SysupgradeNAND,$(2),squashfs,$(KDIR_TMP)/vmlinux-$(2).uImage)
-endef
 
 Image/Build/OpenMesh/buildkernel=$(call MkuImageLzma,$(2))
 
@@ -2190,8 +2161,6 @@ $(eval $(call SingleProfile,NetgearNAND,64k,R6100,r6100,R6100,ttyS0,115200,$$(r6
 $(eval $(call SingleProfile,ZyXELNAND,128k,NBG6716,nbg6716,NBG6716,ttyS0,115200,NBG6716,$$(zyx_nbg6716_mtdlayout),mem=256M))
 
 $(eval $(call MultiProfile,WNDR4300,WNDR3700V4 WNDR4300V1))
-
-$(eval $(call SingleProfile,GLNAND,64k,GLAR300MNAND,gl-ar300m,GL-AR300M,ttyS0,115200,$$(gl-ar300m-nand_mtdlayout),gl-ar300m))
 endif # ifeq ($(SUBTARGET),nand)
 
 
