@@ -1,0 +1,22 @@
+--- a/package/boot/uboot-envtools/files/ar71xx
++++ b/package/boot/uboot-envtools/files/ar71xx
+@@ -18,6 +18,7 @@ all0258n | \
+ cap4200ag | \
+ carambola2 | \
+ eap300v2 | \
++gl-ar300m | \
+ hornet-ub | \
+ hornet-ub-x2 | \
+ mr600 | \
+--- a/target/linux/ar71xx/base-files/etc/diag.sh
++++ b/target/linux/ar71xx/base-files/etc/diag.sh
+@@ -371,6 +371,9 @@ set_state() {
+ 	done)
+ 		status_led_on
+ 		case $(ar71xx_board_name) in
++		gl-ar300m)
++			fw_setenv "bootcount" 0
++			;;
+ 		qihoo-c301)
+ 			local n=$(fw_printenv activeregion | cut -d = -f 2)
+ 			fw_setenv "image${n}trynum" 0
