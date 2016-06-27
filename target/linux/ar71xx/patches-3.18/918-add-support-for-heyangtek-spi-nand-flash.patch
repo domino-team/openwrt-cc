@@ -1,0 +1,34 @@
+Index: linux-3.18.29/drivers/mtd/nand/nand_ids.c
+===================================================================
+--- linux-3.18.29.orig/drivers/mtd/nand/nand_ids.c
++++ linux-3.18.29/drivers/mtd/nand/nand_ids.c
+@@ -78,7 +78,8 @@ struct nand_flash_dev nand_flash_ids[] =
+ 	LEGACY_ID_NAND("NAND 128MiB 1,8V 16-bit", 0x72, 128, SZ_16K, SP_OPTIONS16),
+ 	LEGACY_ID_NAND("NAND 128MiB 1,8V 16-bit", 0x49, 128, SZ_16K, SP_OPTIONS16),
+ 	LEGACY_ID_NAND("NAND 128MiB 3,3V 16-bit", 0x74, 128, SZ_16K, SP_OPTIONS16),
+-	LEGACY_ID_NAND("NAND 128MiB 3,3V 16-bit", 0x59, 128, SZ_16K, SP_OPTIONS16),
++	/* LEGACY_ID_NAND("NAND 128MiB 3,3V 16-bit", 0x59, 128, SZ_16K, SP_OPTIONS16), */
++	EXTENDED_ID_NAND("NAND 128MiB 1,8V 16-bit", 0x59, 128, LP_OPTIONS16),
+ 
+ 	LEGACY_ID_NAND("NAND 256MiB 3,3V 8-bit", 0x71, 256, SZ_16K, SP_OPTIONS),
+ 
+@@ -179,6 +180,7 @@ struct nand_manufacturers nand_manuf_ids
+ 	{NAND_MFR_SANDISK, "SanDisk"},
+ 	{NAND_MFR_INTEL, "Intel"},
+ 	{NAND_MFR_GIGADEVICE, "Giga Device"},
++	{NAND_MFR_HEYANGTEK, "HeYang Tek"},
+ 	{0x0, "Unknown"}
+ };
+ 
+Index: linux-3.18.29/include/linux/mtd/nand.h
+===================================================================
+--- linux-3.18.29.orig/include/linux/mtd/nand.h
++++ linux-3.18.29/include/linux/mtd/nand.h
+@@ -721,6 +721,7 @@ struct nand_chip {
+ #define NAND_MFR_AMD		0x01
+ #define NAND_MFR_MACRONIX	0xc2
+ #define NAND_MFR_GIGADEVICE	0xc8
++#define NAND_MFR_HEYANGTEK	0xc9
+ #define NAND_MFR_EON		0x92
+ #define NAND_MFR_SANDISK	0x45
+ #define NAND_MFR_INTEL		0x89

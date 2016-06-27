@@ -118,6 +118,27 @@ static const struct nand_ecclayout ath79_spinand_oob_128 = {
 	.oobfree = { {.offset = 16, .length = 48}, }
 };
 
+/* HeYang Tek spi nand */
+static struct nand_ecclayout hyt_spinand_oob_128 = {
+        .eccbytes       = 96,
+        .eccpos         = { 32, 33, 34, 35, 36, 37, 38, 39,
+                            40, 41, 42, 43, 44, 45, 46, 47,
+                            48, 49, 50, 51, 52, 53, 54, 55,
+                            56, 57, 58, 59, 60, 61, 62, 63,
+                            64, 65, 66, 67, 68, 69, 70, 71,
+                            72, 73, 74, 75, 76, 77, 78, 79,
+                            80, 81, 82, 83, 84, 85, 86, 87,
+                            88, 89, 90, 91, 92, 93, 94, 95,
+                            96, 97, 98, 99, 100, 101, 102, 103,
+                            104, 105, 106, 107, 108, 109, 110, 111,
+                            112, 113, 114, 115, 116, 117, 118, 119,
+                            120, 121, 122, 123, 124, 125, 126, 127},
+
+        /* Not including spare regions that are not ECC-ed */
+        .oobavail       = 32,
+        .oobfree        = { { .offset = 0, .length = 32 } },
+};
+
 static u8 badblock_pattern[] = { 0xff, };
 
 static struct nand_bbt_descr ath79_badblock_pattern = {
@@ -740,6 +761,7 @@ static int ath79_spinand_probe(struct spi_device *spi_nand)
 	struct nand_chip *chip;
 	struct ath79_spinand_info *info;
 	struct ath79_spinand_state *state;
+	u8 id[3];
 
 	info  = devm_kzalloc(&spi_nand->dev, sizeof(struct ath79_spinand_info),
 			GFP_KERNEL);
@@ -769,9 +791,17 @@ static int ath79_spinand_probe(struct spi_device *spi_nand)
 
 	chip->ecc.mode	= NAND_ECC_HW;
 	chip->ecc.size	= 512;
-	chip->ecc.bytes	= 16;
 	chip->ecc.strength = 1;
-	chip->ecc.layout = (void *)&ath79_spinand_oob_128;
+
+	ath79_spinand_read_id(spi_nand, id);
+	if (id[1] == 0x59) {
+		chip->ecc.bytes	= 24;
+		chip->ecc.layout = (void *)&hyt_spinand_oob_128;
+	} else {
+		chip->ecc.bytes	= 16;
+		chip->ecc.layout = (void *)&ath79_spinand_oob_128;
+	}
+
 	chip->badblock_pattern = &ath79_badblock_pattern;
 	chip->ecc.read_page = ath79_spinand_read_page_hwecc;
 	chip->ecc.write_page = ath79_spinand_write_page_hwecc;
