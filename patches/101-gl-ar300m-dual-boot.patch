@@ -15,7 +15,7 @@
  		status_led_on
  		case $(ar71xx_board_name) in
 +		gl-ar300m)
-+			fw_setenv "bootcount" 0
++			fw_printenv lc >/dev/null 2>&1 && fw_setenv "bootcount" 0
 +			;;
  		qihoo-c301)
  			local n=$(fw_printenv activeregion | cut -d = -f 2)
