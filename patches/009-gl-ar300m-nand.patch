@@ -1,7 +1,5 @@
-Index: cc/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-===================================================================
---- cc.orig/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
-+++ cc/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
+--- a/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
++++ b/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
 @@ -157,6 +157,37 @@ alfa_check_image() {
  	return 0
  }
@@ -71,10 +69,8 @@ Index: cc/target/linux/ar71xx/base-files/lib/upgrade/platform.sh
  	nbg6716 | \
  	r6100 | \
  	wndr3700v4 | \
-Index: cc/target/linux/ar71xx/image/Makefile
-===================================================================
---- cc.orig/target/linux/ar71xx/image/Makefile
-+++ cc/target/linux/ar71xx/image/Makefile
+--- a/target/linux/ar71xx/image/Makefile
++++ b/target/linux/ar71xx/image/Makefile
 @@ -1078,6 +1078,7 @@ mynet_n600_mtdlayout=mtdparts=spi0.0:256
  mynet_rext_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,7808k(firmware),64k(nvram)ro,64k(ART)ro
  zyx_nbg6716_mtdlayout=mtdparts=spi0.0:256k(u-boot)ro,64k(env)ro,64k(RFdata)ro,-(nbu);ar934x-nfc:2048k(zyxel_rfsd),2048k(romd),1024k(header),2048k(kernel),-(ubi)
@@ -127,10 +123,8 @@ Index: cc/target/linux/ar71xx/image/Makefile
  endif # ifeq ($(SUBTARGET),nand)
  
  
-Index: cc/target/linux/ar71xx/image/ubinize-gl-ar300m.ini
-===================================================================
 --- /dev/null
-+++ cc/target/linux/ar71xx/image/ubinize-gl-ar300m.ini
++++ b/target/linux/ar71xx/image/ubinize-gl-ar300m.ini
 @@ -0,0 +1,26 @@
 +[rootfs]
 +# Volume mode (other option is static)
@@ -158,10 +152,8 @@ Index: cc/target/linux/ar71xx/image/ubinize-gl-ar300m.ini
 +# Autoresize volume at first mount
 +vol_flags=autoresize
 +vol_size=1MiB
-Index: cc/target/linux/ar71xx/nand/profiles/gl-inet.mk
-===================================================================
 --- /dev/null
-+++ cc/target/linux/ar71xx/nand/profiles/gl-inet.mk
++++ b/target/linux/ar71xx/nand/profiles/gl-inet.mk
 @@ -0,0 +1,17 @@
 +#
 +# Copyright (C) 2009-2014 OpenWrt.org
@@ -180,10 +172,8 @@ Index: cc/target/linux/ar71xx/nand/profiles/gl-inet.mk
 +	Package set optimized for the GL-AR300M with nand flash.
 +endef
 +$(eval $(call Profile,GLAR300MNAND))
-Index: cc/target/linux/ar71xx/patches-3.18/908-MIPS-ath79-add-spi-nand-driver.patch
-===================================================================
 --- /dev/null
-+++ cc/target/linux/ar71xx/patches-3.18/908-MIPS-ath79-add-spi-nand-driver.patch
++++ b/target/linux/ar71xx/patches-3.18/908-MIPS-ath79-add-spi-nand-driver.patch
 @@ -0,0 +1,52 @@
 +Index: linux-3.18.23/drivers/mtd/nand/Kconfig
 +===================================================================
@@ -237,11 +227,9 @@ Index: cc/target/linux/ar71xx/patches-3.18/908-MIPS-ath79-add-spi-nand-driver.pa
 + #define NAND_MFR_EON		0x92
 + #define NAND_MFR_SANDISK	0x45
 + #define NAND_MFR_INTEL		0x89
-Index: cc/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
-===================================================================
 --- /dev/null
-+++ cc/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
-@@ -0,0 +1,834 @@
++++ b/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
+@@ -0,0 +1,864 @@
 +/*
 + * Copyright (c) 2015 The Linux Foundation. All rights reserved.
 + *
@@ -360,6 +348,27 @@ Index: cc/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
 +		120, 121, 122, 123, 124, 125, 126, 127},
 +	.oobavail = 48,
 +	.oobfree = { {.offset = 16, .length = 48}, }
++};
++
++/* HeYang Tek spi nand */
++static struct nand_ecclayout hyt_spinand_oob_128 = {
++        .eccbytes       = 96,
++        .eccpos         = { 32, 33, 34, 35, 36, 37, 38, 39,
++                            40, 41, 42, 43, 44, 45, 46, 47,
++                            48, 49, 50, 51, 52, 53, 54, 55,
++                            56, 57, 58, 59, 60, 61, 62, 63,
++                            64, 65, 66, 67, 68, 69, 70, 71,
++                            72, 73, 74, 75, 76, 77, 78, 79,
++                            80, 81, 82, 83, 84, 85, 86, 87,
++                            88, 89, 90, 91, 92, 93, 94, 95,
++                            96, 97, 98, 99, 100, 101, 102, 103,
++                            104, 105, 106, 107, 108, 109, 110, 111,
++                            112, 113, 114, 115, 116, 117, 118, 119,
++                            120, 121, 122, 123, 124, 125, 126, 127},
++
++        /* Not including spare regions that are not ECC-ed */
++        .oobavail       = 32,
++        .oobfree        = { { .offset = 0, .length = 32 } },
 +};
 +
 +static u8 badblock_pattern[] = { 0xff, };
@@ -984,6 +993,7 @@ Index: cc/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
 +	struct nand_chip *chip;
 +	struct ath79_spinand_info *info;
 +	struct ath79_spinand_state *state;
++	u8 id[3];
 +
 +	info  = devm_kzalloc(&spi_nand->dev, sizeof(struct ath79_spinand_info),
 +			GFP_KERNEL);
@@ -1013,9 +1023,17 @@ Index: cc/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
 +
 +	chip->ecc.mode	= NAND_ECC_HW;
 +	chip->ecc.size	= 512;
-+	chip->ecc.bytes	= 16;
 +	chip->ecc.strength = 1;
-+	chip->ecc.layout = (void *)&ath79_spinand_oob_128;
++
++	ath79_spinand_read_id(spi_nand, id);
++	if (id[1] == 0x59) {
++		chip->ecc.bytes	= 24;
++		chip->ecc.layout = (void *)&hyt_spinand_oob_128;
++	} else {
++		chip->ecc.bytes	= 16;
++		chip->ecc.layout = (void *)&ath79_spinand_oob_128;
++	}
++
 +	chip->badblock_pattern = &ath79_badblock_pattern;
 +	chip->ecc.read_page = ath79_spinand_read_page_hwecc;
 +	chip->ecc.write_page = ath79_spinand_write_page_hwecc;
@@ -1076,10 +1094,8 @@ Index: cc/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
 +
 +MODULE_DESCRIPTION("SPI NAND driver for Giga Device");
 +MODULE_LICENSE("GPL v2");
-Index: cc/target/linux/ar71xx/nand/config-default
-===================================================================
---- cc.orig/target/linux/ar71xx/nand/config-default
-+++ cc/target/linux/ar71xx/nand/config-default
+--- a/target/linux/ar71xx/nand/config-default
++++ b/target/linux/ar71xx/nand/config-default
 @@ -90,6 +90,7 @@ CONFIG_MTD_NAND=y
  CONFIG_MTD_NAND_AR934X=y
  CONFIG_MTD_NAND_AR934X_HW_ECC=y
