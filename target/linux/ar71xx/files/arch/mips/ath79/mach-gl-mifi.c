@@ -27,6 +27,7 @@
 #define GL_MIFI_GPIO_LED_LAN		16
 #define GL_MIFI_GPIO_LED_WLAN		1
 #define GL_MIFI_GPIO_LED_NET		0
+#define GL_MIFI_GPIO_LED_3GCONTROL	7
 
 #define GL_MIFI_GPIO_BTN_RESET    11
 
@@ -59,6 +60,11 @@ static struct gpio_led gl_mifi_leds_gpio[] __initdata = {
 		.gpio = GL_MIFI_GPIO_LED_NET,
 		.active_low = 0,
 	},
+	{
+		.name = "gl_mifi:3gcontrol",
+		.gpio = GL_MIFI_GPIO_LED_3GCONTROL,
+		.active_low = 0,
+	}
 };
 
 static struct gpio_keys_button gl_mifi_gpio_keys[] __initdata = {
