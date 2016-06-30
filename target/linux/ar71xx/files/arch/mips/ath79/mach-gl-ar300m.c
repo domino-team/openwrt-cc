@@ -15,7 +15,9 @@
 #include <linux/pci.h>
 
 #include <asm/mach-ath79/ath79.h>
+#include <asm/mach-ath79/ar71xx_regs.h>
 
+#include "common.h"
 #include "dev-ap9x-pci.h"
 #include "dev-eth.h"
 #include "dev-gpio-buttons.h"
@@ -137,6 +139,7 @@ static void __init gl_ar300m_setup(void)
     u8 *art = (u8 *) KSEG1ADDR(0x1fff0000);
     u8 tmpmac[ETH_ALEN];
 
+    ath79_gpio_function_enable(AR934X_GPIO_FUNC_JTAG_DISABLE);
     ath79_register_spi(&gl_ar300m_spi_data, gl_ar300m_spi_info, 2);
 
     /* register gpio LEDs and keys */
