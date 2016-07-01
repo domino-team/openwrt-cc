@@ -13,7 +13,7 @@ the lack of case sensitiveness in the file system.
 
 ```
 $ sudo apt-get update
-$ sudo apt-get install subversion build-essential git-core libncurses5-dev zlib1g-dev gawk flex quilt libssl-dev xsltproc libxml-parser-perl mercurial bzr ecj cvs unzip git
+$ sudo apt-get install subversion build-essential git-core libncurses5-dev zlib1g-dev gawk flex quilt libssl-dev xsltproc libxml-parser-perl mercurial bzr ecj cvs unzip git wget
 $ git clone https://github.com/domino-team/openwrt-cc.git
 $ cd openwrt-cc
 $ ./scripts/feeds update -a
