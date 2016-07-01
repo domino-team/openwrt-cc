@@ -50,6 +50,7 @@ static struct gpio_led gl_ar300m_leds_gpio[] __initdata = {
         .name = "gl-ar300m:usb",
         .gpio = GL_AR300M_GPIO_LED_USB,
         .active_low = 0,
+        .default_state = 1,
     },
     {
         .name = "gl-ar300m:wlan",
