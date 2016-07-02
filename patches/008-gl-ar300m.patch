@@ -23,7 +23,7 @@
  gl-inet |\
 --- /dev/null
 +++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-ar300m.c
-@@ -0,0 +1,181 @@
+@@ -0,0 +1,182 @@
 +/*
 + *  GLI AR300M(D) board support
 + *
@@ -76,6 +76,7 @@
 +        .name = "gl-ar300m:usb",
 +        .gpio = GL_AR300M_GPIO_LED_USB,
 +        .active_low = 0,
++        .default_state = 1,
 +    },
 +    {
 +        .name = "gl-ar300m:wlan",
