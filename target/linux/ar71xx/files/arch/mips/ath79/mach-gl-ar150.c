@@ -25,9 +25,9 @@
 
 #define GL_AR150_GPIO_LED_WLAN		   0
 #define GL_AR150_GPIO_LED_LAN		   13
-#define GL_AR150_GPIO_LED_WAN		   15 
+#define GL_AR150_GPIO_LED_WAN		   15
 
-#define GL_AR150_GPIO_BIN_USB         6
+#define GL_AR150_GPIO_USB_POW         6
 #define GL_AR150_GPIO_BTN_MANUAL      7
 #define GL_AR150_GPIO_BTN_AUTO	   	   8
 #define GL_AR150_GPIO_BTN_RESET	   11
@@ -56,6 +56,12 @@ static struct gpio_led gl_ar150_leds_gpio[] __initdata = {
 		.gpio = GL_AR150_GPIO_LED_WAN,
 		.active_low = 0,
  		.default_state = 1,
+	},
+	{
+		.name = "gl_ar150:usbpow",
+		.gpio = GL_AR150_GPIO_USB_POW,
+		.active_low = 0,
+		.default_state = 1,
 	},
 };
 
@@ -110,7 +116,7 @@ static void __init gl_ar150_setup(void)
 				 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
 	 			 "USB power");
 	ath79_register_usb();
-	
+
 	/* register eth0 as WAN, eth1 as LAN */
 	ath79_init_mac(ath79_eth0_data.mac_addr, art+GL_AR150_MAC0_OFFSET, 0);
 	ath79_init_mac(ath79_eth1_data.mac_addr, art+GL_AR150_MAC1_OFFSET, 0);
