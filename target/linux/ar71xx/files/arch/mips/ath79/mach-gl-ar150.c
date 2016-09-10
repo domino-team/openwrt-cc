@@ -112,7 +112,7 @@ static void __init gl_ar150_setup(void)
 					gl_ar150_gpio_keys);
 
 	/* enable usb */
-	gpio_request_one(GL_AR150_GPIO_BIN_USB,
+	gpio_request_one(GL_AR150_GPIO_USB_POW,
 				 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
 	 			 "USB power");
 	ath79_register_usb();
