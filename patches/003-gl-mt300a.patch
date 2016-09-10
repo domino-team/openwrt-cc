@@ -84,7 +84,7 @@
 +		gpio2: gpio@660 {
 +			status = "okay";
 +		};
-+		
++
 +		gpio3: gpio@688 {
 +		      status = "okay";
 +		 };
@@ -193,7 +193,7 @@
 +		};
 +
 +		usb {
-+			label = "gl-mt300a:usb";
++			label = "gl-mt300a:usbpow";
 +			gpios = <&gpio0 7 1>;
 +		};
 +

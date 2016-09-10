@@ -84,7 +84,7 @@
  		ucidef_set_interfaces_lan_wan "eth0.1" "eth0.2"
 --- /dev/null
 +++ b/target/linux/ramips/dts/GL-MT300N.dts
-@@ -0,0 +1,152 @@
+@@ -0,0 +1,157 @@
 +/dts-v1/;
 +
 +/include/ "mt7620n.dtsi"
@@ -109,7 +109,7 @@
 +		gpio2: gpio@660 {
 +			status = "okay";
 +		};
-+		
++
 +		gpio3: gpio@688 {
 +		      status = "okay";
 +		 };
@@ -209,6 +209,11 @@
 +		wlan {
 +			label = "gl-mt300n:wlan";
 +			gpios = <&gpio3 0 1>;
++		};
++
++		usb {
++			label = "gl-mt300n:usbpow";
++			gpios = <&gpio0 7 1>;
 +		};
 +
 +	};
