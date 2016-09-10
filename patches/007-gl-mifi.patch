@@ -146,7 +146,7 @@
 +gl-mifi)
 +	ucidef_set_led_netdev "wan" "WAN" "gl_mifi:wan" "eth0"
 +	ucidef_set_led_netdev "lan" "LAN" "gl_mifi:lan" "eth1"
-+	ucidef_set_led_netdev "3gnet" "3GNET" "gl_mifi:net" "3g-wan"
++	ucidef_set_led_netdev "3gnet" "3GNET" "gl_mifi:net" "3g-modem"
 +	ucidef_set_led_wlan "wlan" "WLAN" "gl_mifi:wlan" "phy0tpt"
 +	;;
 +
