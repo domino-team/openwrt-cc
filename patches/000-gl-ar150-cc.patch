@@ -12,7 +12,7 @@
  		;;
 --- /dev/null
 +++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-ar150.c
-@@ -0,0 +1,131 @@
+@@ -0,0 +1,128 @@
 +/*
 + *  GL_ar150 board support
 + *
@@ -127,9 +127,6 @@
 +					gl_ar150_gpio_keys);
 +
 +	/* enable usb */
-+	gpio_request_one(GL_AR150_GPIO_USB_POW,
-+				 GPIOF_OUT_INIT_HIGH | GPIOF_EXPORT_DIR_FIXED,
-+	 			 "USB power");
 +	ath79_register_usb();
 +
 +	/* register eth0 as WAN, eth1 as LAN */
