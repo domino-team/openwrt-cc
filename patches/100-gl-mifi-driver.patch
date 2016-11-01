@@ -1,6 +1,6 @@
 --- /dev/null
 +++ b/target/linux/ar71xx/patches-3.18/916-MIPS-ath79-add-gl_mifi_driver.patch
-@@ -0,0 +1,218 @@
+@@ -0,0 +1,214 @@
 +--- a/drivers/usb/serial/option.c
 ++++ b/drivers/usb/serial/option.c
 +@@ -1037,6 +1037,7 @@ static const struct usb_device_id option
@@ -31,7 +31,7 @@
 + #endif
 + };
 + 
-+@@ -1919,6 +1926,18 @@ static int option_probe(struct usb_seria
++@@ -1919,6 +1926,14 @@ static int option_probe(struct usb_seria
 + 	    iface_desc->bInterfaceClass != USB_CLASS_CDC_DATA)
 + 		return -ENODEV;
 + 
@@ -40,17 +40,13 @@
 ++			|| dev_desc->idProduct == 0x9090 || dev_desc->idProduct == 0x9215)) {
 ++		pm_runtime_set_autosuspend_delay(&serial->dev->dev, 3000);
 ++		usb_enable_autosuspend(serial->dev);
-++	}
-++	struct usb_device_descriptor *dev_desc = &serial->dev->descriptor;
-++	if (dev_desc->idVendor == 0x05C6 && (dev_desc->idProduct == 0x9003
-++			|| dev_desc->idProduct == 0x9090 || dev_desc->idProduct == 0x9215)) {
 ++		device_init_wakeup(&serial->dev->dev, 1); //usb remote wakeup
 ++	}
 ++
 + 	/* Store device id so we can use it during attach. */
 + 	usb_set_serial_data(serial, (void *)id);
 + 
-+@@ -1932,6 +1951,11 @@ static int option_attach(struct usb_seri
++@@ -1932,6 +1947,11 @@ static int option_attach(struct usb_seri
 + 	struct usb_wwan_intf_private *data;
 + 	struct option_private *priv;
 + 
@@ -62,7 +58,7 @@
 + 	data = kzalloc(sizeof(struct usb_wwan_intf_private), GFP_KERNEL);
 + 	if (!data)
 + 		return -ENOMEM;
-+@@ -1956,6 +1980,15 @@ static int option_attach(struct usb_seri
++@@ -1956,6 +1976,15 @@ static int option_attach(struct usb_seri
 + 	}
 + 	spin_lock_init(&data->susp_lock);
 + 
