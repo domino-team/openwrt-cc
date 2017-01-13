@@ -65,7 +65,11 @@ proto_3g_setup() {
 					gprs_only) CODE="13,1";;
 					*) CODE="2,2";;
 				esac
-				export MODE="AT^SYSCFG=${CODE},3FFFFFFF,2,4"
+				if echo "$cardinfo" | grep -qi  ME909s-821; then
+					export MODE="AT^SYSCFGEX=\"00\",3FFFFFFF,1,2,7FFFFFFFFFFFFFFF,,"
+				else
+					export MODE="AT^SYSCFG=${CODE},3FFFFFFF,2,4"
+				fi
 			fi
 
 			if [ -n "$pincode" ]; then
