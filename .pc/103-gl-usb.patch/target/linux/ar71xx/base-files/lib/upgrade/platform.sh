@@ -251,7 +251,6 @@ platform_check_image() {
 	gl-ar300 | \
 	gl-ar300m | \
 	gl-domino | \
-	gl-usb | \
 	epg5000 | \
 	esr1750 | \
 	esr900 | \

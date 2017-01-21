@@ -470,9 +470,6 @@ ar71xx_board_detect() {
 	*"GL-MIFI")
         name="gl-mifi"
         ;;
-	*"GL-USB")
-		name="gl-usb"
-		;;
 	*"EnGenius EPG5000")
 		name="epg5000"
 		;;

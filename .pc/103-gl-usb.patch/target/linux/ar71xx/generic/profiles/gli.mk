@@ -66,15 +66,3 @@ define Profile/GL-AR300M/description
 	Package set optimized for the GL-AR300M.
 endef
 $(eval $(call Profile,GL-AR300M))
-
-define Profile/GL-USB
-        NAME:=GL-USB
-        PACKAGES:=kmod-usb-core kmod-usb2 kmod-ledtrig-gpio
-endef
-
-define Profile/GL-USB/Description
-        Configuration of GL USB nano router
-endef
-
-$(eval $(call Profile,GL-USB))
-

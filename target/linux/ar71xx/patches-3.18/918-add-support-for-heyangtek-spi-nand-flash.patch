@@ -1,7 +1,5 @@
-Index: linux-3.18.29/drivers/mtd/nand/nand_ids.c
-===================================================================
---- linux-3.18.29.orig/drivers/mtd/nand/nand_ids.c
-+++ linux-3.18.29/drivers/mtd/nand/nand_ids.c
+--- a/drivers/mtd/nand/nand_ids.c
++++ b/drivers/mtd/nand/nand_ids.c
 @@ -78,7 +78,8 @@ struct nand_flash_dev nand_flash_ids[] =
  	LEGACY_ID_NAND("NAND 128MiB 1,8V 16-bit", 0x72, 128, SZ_16K, SP_OPTIONS16),
  	LEGACY_ID_NAND("NAND 128MiB 1,8V 16-bit", 0x49, 128, SZ_16K, SP_OPTIONS16),
@@ -20,10 +18,8 @@ Index: linux-3.18.29/drivers/mtd/nand/nand_ids.c
  	{0x0, "Unknown"}
  };
  
-Index: linux-3.18.29/include/linux/mtd/nand.h
-===================================================================
---- linux-3.18.29.orig/include/linux/mtd/nand.h
-+++ linux-3.18.29/include/linux/mtd/nand.h
+--- a/include/linux/mtd/nand.h
++++ b/include/linux/mtd/nand.h
 @@ -721,6 +721,7 @@ struct nand_chip {
  #define NAND_MFR_AMD		0x01
  #define NAND_MFR_MACRONIX	0xc2
