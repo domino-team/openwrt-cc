@@ -8,15 +8,19 @@
  
  
  	{ USB_DEVICE(NOVATELWIRELESS_VENDOR_ID, NOVATELWIRELESS_PRODUCT_V640) },
-@@ -1818,6 +1819,11 @@ static const struct usb_device_id option
+@@ -1818,6 +1819,15 @@ static const struct usb_device_id option
  	{ USB_DEVICE_INTERFACE_CLASS(0x2020, 0x4000, 0xff) },                /* OLICARD300 - MT6225 */
  	{ USB_DEVICE(INOVIA_VENDOR_ID, INOVIA_SEW858) },
  	{ USB_DEVICE(VIATELECOM_VENDOR_ID, VIATELECOM_PRODUCT_CDS7) },
 +	{ USB_DEVICE(0x05C6, 0x9090) },              //For Quectell UC15
 +	{ USB_DEVICE(0x05C6, 0x9003) },              //For Quectel UC20
-+	{ USB_DEVICE(0x05C6, 0x9215) },             //For Quectel EC20
-+	{ USB_DEVICE(0x2c7c, 0x0125) },             //For Quectel EC25 EC20 R2.0
-+	{ USB_DEVICE(ZTE_VENDOR_ID, 0x0016) }, //For ZTE ME3620
++	{ USB_DEVICE(0x05C6, 0x9215) },              //For Quectel EC20
++	{ USB_DEVICE(0x2c7c, 0x0125) },              //For Quectel EC25 EC20 R2.0
++	{ USB_DEVICE(0x2c7c, 0x0121) },              //For Quectel EC21
++	{ USB_DEVICE(ZTE_VENDOR_ID, 0x0016) },       //For ZTE ME3620
++	{ USB_DEVICE(0x19d2, 0x1476) },              //For ZTE ME3630
++	{ USB_DEVICE(0x19d2, 0x0536) },              //For ALEKA MZ382
++	{ USB_DEVICE(0x1782, 0x0002) },              //For ALEKA IE401
  	{ } /* Terminating entry */
  };
  MODULE_DEVICE_TABLE(usb, option_ids);
