@@ -23,8 +23,9 @@
 #include "dev-wmac.h"
 #include "machtypes.h"
 
-#define GL_USB_GPIO_LED_WLAN		   0
+#define GL_USB_GPIO_LED_WLAN	   0
 #define GL_USB_GPIO_LED_LAN		   13
+#define GL_USB_GPIO_LAN_RESET	7
 
 #define GL_USB_GPIO_BTN_RESET	   11
 
@@ -46,6 +47,12 @@ static struct gpio_led gl_usb_leds_gpio[] __initdata = {
 		.gpio = GL_USB_GPIO_LED_LAN,
 		.active_low = 0,
 		.default_state = 1,
+	},
+	{
+	    .name = "gl-usb:resetlan",
+		.gpio = GL_USB_GPIO_LAN_RESET,
+		.active_low = 0,
+		.default_state = 0,
 	},
 };
 

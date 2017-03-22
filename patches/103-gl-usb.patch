@@ -55,7 +55,7 @@
  CONFIG_ATH79_MACH_HIWIFI_HC6361=y
 --- /dev/null
 +++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-usb.c
-@@ -0,0 +1,94 @@
+@@ -0,0 +1,101 @@
 +/*
 + *  GL USB nano router support
 + *
@@ -81,8 +81,9 @@
 +#include "dev-wmac.h"
 +#include "machtypes.h"
 +
-+#define GL_USB_GPIO_LED_WLAN		   0
++#define GL_USB_GPIO_LED_WLAN	   0
 +#define GL_USB_GPIO_LED_LAN		   13
++#define GL_USB_GPIO_LAN_RESET	7
 +
 +#define GL_USB_GPIO_BTN_RESET	   11
 +
@@ -104,6 +105,12 @@
 +		.gpio = GL_USB_GPIO_LED_LAN,
 +		.active_low = 0,
 +		.default_state = 1,
++	},
++	{
++	    .name = "gl-usb:resetlan",
++		.gpio = GL_USB_GPIO_LAN_RESET,
++		.active_low = 0,
++		.default_state = 0,
 +	},
 +};
 +
