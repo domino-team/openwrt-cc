@@ -184,8 +184,8 @@ dlan-pro-1200-ac)
 gl-ar150)
 	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
 	;;
-gl-usb)
-	ucidef_set_led_wlan "wlan" "WLAN" "gl-usb:wlan" "phy0tpt"
+gl-usb150)
+	ucidef_set_led_wlan "wlan" "WLAN" "gl-usb150:wlan" "phy0tpt"
 	;;
 gl-ar300m)
 	ucidef_set_led_wlan "wlan" "WLAN" "gl-ar300m:wlan" "phy0tpt"

@@ -5,8 +5,8 @@
  	ucidef_set_led_wlan "wlan" "WLAN" "gl_ar150:wlan" "phy0tpt"
  	;;
 -
-+gl-usb)
-+	ucidef_set_led_wlan "wlan" "WLAN" "gl-usb:wlan" "phy0tpt"
++gl-usb150)
++	ucidef_set_led_wlan "wlan" "WLAN" "gl-usb150:wlan" "phy0tpt"
 +	;;
  gl-ar300m)
  	ucidef_set_led_wlan "wlan" "WLAN" "gl-ar300m:wlan" "phy0tpt"
@@ -17,7 +17,7 @@
  eap300v2 |\
  eap7660d |\
  el-mini |\
-+gl-usb |\
++gl-usb150 |\
  loco-m-xw |\
  mr600 |\
  mr600v2 |\
@@ -27,8 +27,8 @@
  	*"GL-MIFI")
          name="gl-mifi"
          ;;
-+	*"GL-USB")
-+		name="gl-usb"
++	*"GL-USB150")
++		name="gl-usb150"
 +		;;
  	*"EnGenius EPG5000")
  		name="epg5000"
@@ -39,7 +39,7 @@
  	gl-ar300 | \
  	gl-ar300m | \
  	gl-domino | \
-+	gl-usb | \
++	gl-usb150 | \
  	epg5000 | \
  	esr1750 | \
  	esr900 | \
@@ -49,12 +49,12 @@
  CONFIG_ATH79_MACH_GL_AR300M=y
  CONFIG_ATH79_MACH_GL_DOMINO=y
  CONFIG_ATH79_MACH_GL_INET=y
-+CONFIG_ATH79_MACH_GL_USB=y
++CONFIG_ATH79_MACH_GL_USB150=y
  CONFIG_ATH79_MACH_GS_MINIBOX_V1=y
  CONFIG_ATH79_MACH_GS_OOLITE=y
  CONFIG_ATH79_MACH_HIWIFI_HC6361=y
 --- /dev/null
-+++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-usb.c
++++ b/target/linux/ar71xx/files/arch/mips/ath79/mach-gl-usb150.c
 @@ -0,0 +1,101 @@
 +/*
 + *  GL USB nano router support
@@ -96,18 +96,18 @@
 +
 +static struct gpio_led gl_usb_leds_gpio[] __initdata = {
 +	{
-+		.name = "gl-usb:wlan",
++		.name = "gl-usb150:wlan",
 +		.gpio = GL_USB_GPIO_LED_WLAN,
 +		.active_low = 0,
 +	},
 +	{
-+		.name = "gl-usb:pow",
++		.name = "gl-usb150:pow",
 +		.gpio = GL_USB_GPIO_LED_LAN,
 +		.active_low = 0,
 +		.default_state = 1,
 +	},
 +	{
-+	    .name = "gl-usb:resetlan",
++	    .name = "gl-usb150:resetlan",
 +		.gpio = GL_USB_GPIO_LAN_RESET,
 +		.active_low = 0,
 +		.default_state = 0,
@@ -156,7 +156,7 @@
 +	ath79_register_wmac(art + GL_USB_CALDATA_OFFSET, art + GL_USB_WMAC_MAC_OFFSET);
 +}
 +
-+MIPS_MACHINE(ATH79_MACH_GL_USB, "GL-USB", "GL-USB",gl_usb_setup);
++MIPS_MACHINE(ATH79_MACH_GL_USB150, "GL-USB150", "GL-USB150",gl_usb_setup);
 --- a/target/linux/ar71xx/generic/profiles/gli.mk
 +++ b/target/linux/ar71xx/generic/profiles/gli.mk
 @@ -66,3 +66,15 @@ define Profile/GL-AR300M/description
@@ -164,16 +164,16 @@
  endef
  $(eval $(call Profile,GL-AR300M))
 +
-+define Profile/GL-USB
-+        NAME:=GL-USB
-+        PACKAGES:=kmod-usb-core kmod-usb2 kmod-ledtrig-gpio
++define Profile/GL-USB150
++	NAME:=GL-USB150
++	PACKAGES:=kmod-usb-core kmod-usb2 kmod-ledtrig-gpio
 +endef
 +
-+define Profile/GL-USB/Description
-+        Configuration of GL USB nano router
++define Profile/GL-USB150/Description
++	Configuration of GL USB150 nano router
 +endef
 +
-+$(eval $(call Profile,GL-USB))
++$(eval $(call Profile,GL-USB150))
 +
 --- a/target/linux/ar71xx/image/Makefile
 +++ b/target/linux/ar71xx/image/Makefile
@@ -181,13 +181,13 @@
  endef
  TARGET_DEVICES += gl-ar150
  
-+define Device/gl-usb
-+  BOARDNAME = GL-USB
++define Device/gl-usb150
++  BOARDNAME = GL-USB150
 +  IMAGE_SIZE = 16000k
 +  CONSOLE = ttyATH0,115200
 +  MTDPARTS = spi0.0:256k(u-boot)ro,64k(u-boot-env)ro,16000k(firmware),64k(art)ro
 +endef
-+TARGET_DEVICES += gl-usb
++TARGET_DEVICES += gl-usb150
 +
  define Device/gl-mifi
    BOARDNAME = GL-MIFI
@@ -201,7 +201,7 @@
 +    select ATH79_DEV_USB
 +    select ATH79_DEV_WMAC
 + 
-++config ATH79_MACH_GL_USB
+++config ATH79_MACH_GL_USB150
 ++   bool "GL USB nano router support"
 ++   select SOC_AR933X
 ++   select ATH79_DEV_ETH
@@ -220,7 +220,7 @@
 + obj-$(CONFIG_ATH79_MACH_ESR1750)	+= mach-esr1750.o
 + obj-$(CONFIG_ATH79_MACH_F9K1115V2)	+= mach-f9k1115v2.o
 + obj-$(CONFIG_ATH79_MACH_GL_AR150)	+= mach-gl-ar150.o
-++obj-$(CONFIG_ATH79_MACH_GL_USB)       += mach-gl-usb.o
+++obj-$(CONFIG_ATH79_MACH_GL_USB150)       += mach-gl-usb150.o
 + obj-$(CONFIG_ATH79_MACH_GL_MIFI)	+= mach-gl-mifi.o
 + obj-$(CONFIG_ATH79_MACH_GL_AR300)	+= mach-gl-ar300.o
 + obj-$(CONFIG_ATH79_MACH_GL_AR300M)    += mach-gl-ar300m.o
@@ -230,7 +230,7 @@
 + 	ATH79_MACH_EPG5000,		/* EnGenius EPG5000 */
 + 	ATH79_MACH_F9K1115V2,		/* Belkin AC1750DB */
 + 	ATH79_MACH_GL_AR150,	/* GL-AR150 support */
-++	ATH79_MACH_GL_USB,	/* GL-USB nano router support */
+++	ATH79_MACH_GL_USB150,	/* GL-USB150 nano router support */
 + 	ATH79_MACH_GL_MIFI,	    /* GL-MIFI support */
 + 	ATH79_MACH_GL_AR300,		/* GL-AR300 */
 + 	ATH79_MACH_GL_AR300M,		/* GL-AR300M */

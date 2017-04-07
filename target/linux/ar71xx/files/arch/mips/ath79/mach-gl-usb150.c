@@ -38,18 +38,18 @@
 
 static struct gpio_led gl_usb_leds_gpio[] __initdata = {
 	{
-		.name = "gl-usb:wlan",
+		.name = "gl-usb150:wlan",
 		.gpio = GL_USB_GPIO_LED_WLAN,
 		.active_low = 0,
 	},
 	{
-		.name = "gl-usb:pow",
+		.name = "gl-usb150:pow",
 		.gpio = GL_USB_GPIO_LED_LAN,
 		.active_low = 0,
 		.default_state = 1,
 	},
 	{
-	    .name = "gl-usb:resetlan",
+	    .name = "gl-usb150:resetlan",
 		.gpio = GL_USB_GPIO_LAN_RESET,
 		.active_low = 0,
 		.default_state = 0,
@@ -98,4 +98,4 @@ static void __init gl_usb_setup(void)
 	ath79_register_wmac(art + GL_USB_CALDATA_OFFSET, art + GL_USB_WMAC_MAC_OFFSET);
 }
 
-MIPS_MACHINE(ATH79_MACH_GL_USB, "GL-USB", "GL-USB",gl_usb_setup);
+MIPS_MACHINE(ATH79_MACH_GL_USB150, "GL-USB150", "GL-USB150",gl_usb_setup);

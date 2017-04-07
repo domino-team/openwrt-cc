@@ -67,14 +67,14 @@ define Profile/GL-AR300M/description
 endef
 $(eval $(call Profile,GL-AR300M))
 
-define Profile/GL-USB
-        NAME:=GL-USB
-        PACKAGES:=kmod-usb-core kmod-usb2 kmod-ledtrig-gpio
+define Profile/GL-USB150
+	NAME:=GL-USB150
+	PACKAGES:=kmod-usb-core kmod-usb2 kmod-ledtrig-gpio
 endef
 
-define Profile/GL-USB/Description
-        Configuration of GL USB nano router
+define Profile/GL-USB150/Description
+	Configuration of GL USB150 nano router
 endef
 
-$(eval $(call Profile,GL-USB))
+$(eval $(call Profile,GL-USB150))
 
