@@ -67,8 +67,8 @@ endif
 CONFIGURE_VARS += \
 	IFCONFIG=/sbin/ifconfig \
 	ROUTE=/sbin/route \
-	IPROUTE=/sbin/ip \
-	NETSTAT=/sbin/netstat
+	IPROUTE=/usr/sbin/ip \
+	NETSTAT=/bin/netstat
 
 TARGET_CFLAGS += -ffunction-sections -fdata-sections
 TARGET_LDFLAGS += -Wl,--gc-sections
