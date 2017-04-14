@@ -221,7 +221,7 @@
 + #define NAND_MFR_INTEL		0x89
 --- /dev/null
 +++ b/target/linux/ar71xx/files/drivers/mtd/nand/ath79_spinand.c
-@@ -0,0 +1,864 @@
+@@ -0,0 +1,865 @@
 +/*
 + * Copyright (c) 2015 The Linux Foundation. All rights reserved.
 + *
@@ -779,6 +779,7 @@
 +	if ((status & STATUS_E_FAIL_MASK) == STATUS_E_FAIL) {
 +		dev_err(&spi_nand->dev,
 +			"erase error, block %d\n", block_id);
++		nand_markbad_bbt(mtd,block_id<<(mtd->erasesize_shift));
 +		return -1;
 +	}
 +
