@@ -50,7 +50,7 @@ $(eval $(call Profile,DOMINO))
 
 define Profile/GL-MIFI
 	NAME:=GL-MIFI
-	PACKAGES:=kmod-usb-core kmod-usb2
+	PACKAGES:=kmod-usb-core kmod-usb2 kmod-usb-net
 endef
 define Profile/GL-MIFI/Description
 	Configuration of GL-MIFI.
