@@ -11,3 +11,4 @@
 100-gl-mifi-driver.patch
 101-gl-ar300m-dual-boot.patch
 103-gl-usb.patch
+104-gl-ar300m-support-FM-PN-spinand.patch
