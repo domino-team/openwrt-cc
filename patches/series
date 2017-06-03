@@ -9,8 +9,6 @@
 008-gl-ar300m.patch
 009-gl-ar300m-nand.patch
 100-gl-mifi-driver.patch
-
-
 101-gl-ar300m-dual-boot.patch
 103-gl-usb.patch
 104-gl-ar300m-support-FM-PN-spinand.patch

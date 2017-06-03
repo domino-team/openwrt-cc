@@ -159,6 +159,15 @@
 +MIPS_MACHINE(ATH79_MACH_GL_USB150, "GL-USB150", "GL-USB150",gl_usb_setup);
 --- a/target/linux/ar71xx/generic/profiles/gli.mk
 +++ b/target/linux/ar71xx/generic/profiles/gli.mk
+@@ -50,7 +50,7 @@ $(eval $(call Profile,DOMINO))
+ 
+ define Profile/GL-MIFI
+ 	NAME:=GL-MIFI
+-	PACKAGES:=kmod-usb-core kmod-usb2
++	PACKAGES:=kmod-usb-core kmod-usb2 kmod-usb-net
+ endef
+ define Profile/GL-MIFI/Description
+ 	Configuration of GL-MIFI.
 @@ -66,3 +66,15 @@ define Profile/GL-AR300M/description
  	Package set optimized for the GL-AR300M.
  endef
