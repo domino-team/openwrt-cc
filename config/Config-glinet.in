@@ -1,0 +1,135 @@
+# Copyright (C) 2006-2013 OpenWrt.org
+#
+# This is free software, licensed under the GNU General Public License v2.
+# See /LICENSE for more information.
+#
+
+menu "Glinet support"
+
+	config BASIC_PKG
+		bool "basic package"
+		select PACKAGE_ethtool
+		select PACKAGE_miniupnpc
+		select PACKAGE_fcgi
+		select BUSYBOX_CUSTOM
+		select BUSYBOX_CONFIG_UNICODE_SUPPORT
+		select BUSYBOX_CONFIG_UNICODE_COMBINING_WCHARS
+		select BUSYBOX_CONFIG_UNICODE_WIDE_WCHARS
+		select BUSYBOX_CONFIG_UNICODE_BIDI_SUPPORT
+		select BUSYBOX_CONFIG_UNICODE_NEUTRAL_TABLE
+		select BUSYBOX_CONFIG_UNICODE_PRESERVE_BROKEN
+		select BUSYBOX_CONFIG_FEATURE_WGET_TIMEOUT
+		select BUSYBOX_CONFIG_FUSER
+		select BUSYBOX_CONFIG_IPCRM
+		select BUSYBOX_CONFIG_IPCS
+		select BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP
+		select PACKAGE_lighttpd
+		select PACKAGE_lighttpd-mod-access
+		select PACKAGE_lighttpd-mod-cgi
+		select PACKAGE_lighttpd-mod-expire
+		select PACKAGE_lighttpd-mod-fastcgi
+		select PACKAGE_lighttpd-mod-proxy
+		select PACKAGE_samba36-server
+		select PACKAGE_openvpn-openssl
+		select PACKAGE_unzip
+		select PACKAGE_mc
+		select MC_DIFFVIEWER
+		select MC_EDITOR
+		select MC_SUBSHEL
+		select MC_LARGEFILE
+		select MC_BACKGROUND
+		select MC_CHARSET
+		select MC_VFS
+		select RTC_SUPPORT
+		select PACKAGE_luci
+		select PACKAGE_luci-mod-rpc
+		select PACKAGE_luci-app-qos
+		select PACKAGE_luci-app-samba
+		select PACKAGE_luci-app-upnp
+		select PACKAGE_luci-proto-3g
+		select LUCI_LANG_zh-cn
+		select LUCI_LANG_en
+		select PACKAGE_wpa-cli
+		select PACKAGE_luci-app-mwan3
+		select PACKAGE_kmod-i2c-core
+		select PACKAGE_comgt
+		select PACKAGE_chat
+		select PACKAGE_ip
+		select PACKAGE_libopenssl
+		select OPENVPN_openssl_ENABLE_IPROUTE2
+		select PACKAGE_ppp-mod-pptp
+		select PACKAGE_xl2tpd
+		select PACKAGE_kmod-nf-nathelper-extra	
+		help
+		  choose basic package collection.
+
+	config GL_USB_storage
+		bool "support USB storage"
+		select PACKAGE_blkid
+		select PACKAGE_kmod-fs-ext4
+		select PACKAGE_kmod-fs-ntfs
+		select PACKAGE_kmod-fs-vfat
+		select PACKAGE_kmod-fs-ext4
+		select PACKAGE_kmod-fs-exfat
+		select PACKAGE_ntfs-3g
+		select PACKAGE_kmod-nls-cp437
+		select PACKAGE_kmod-nls-iso8859-1
+		select PACKAGE_kmod-nls-utf8
+		select PACKAGE_kmod-usb-storage
+		select PACKAGE_kmod-usb-uhci
+		select PACKAGE_kmod-usb2
+		select PACKAGE_kmod-usb-ohci
+		help
+		  choose package collection to support USB storage
+
+	config GL_ttyUSB_MODEM
+		bool "support ttyUSB modem"
+		select PACKAGE_wwan
+		select PACKAGE_kmod-usb-serial
+		select PACKAGE_kmod-usb-serial-cp210x
+		select PACKAGE_kmod-usb-serial-option
+		select PACKAGE_kmod-usb-serial-wwan
+		select PACKAGE_kmod-usb-serial-sierrawireless
+		help
+		  choose package collection to support ttyUSB modem
+
+	config GL_modem_qmi_mode
+		bool "support modem qmi mode"
+		select PACKAGE_kmod-mppe
+		select PACKAGE_kmod-usb-net
+		select PACKAGE_kmod-usb-cdc-ether
+		select PACKAGE_kmod-usb-net-rndis
+		select PACKAGE_kmod-usb-net-ipheth
+		select PACKAGE_libusbmuxd
+		select PACKAGE_libimobiledevice
+		select PACKAGE_usbmuxd
+		select PACKAGE_kmod-usb-net-qmi-wwan
+		help
+		  choose package collection to support modem qmi mode
+
+	config GL_huawei_ncm_mode
+		bool "support huawei ncm mode"
+		select PACKAGE_kmod-usb-acm
+		select PACKAGE_usb-modeswitch
+		select PACKAGE_kmod-usb-net-huawei-cdc-ncm
+		select PACKAGE_comgt-directip
+		select PACKAGE_comgt-ncm
+		help
+		  choose package collection to support huawei ncm mode.
+
+	config GL_webcam
+		bool "support webcam"
+		select MJPG_STREAMER_INPUT_UVC
+		select MJPG_STREAMER_OUTPUT_HTTP
+		select PACKAGE_mjpg-streamer
+		select PACKAGE_kmod-video-core
+		select PACKAGE_kmod-video-uvc
+		select PACKAGE_kmod-video-gspca-core
+		select PACKAGE_kmod-video-gspca-zc3xx
+		select PACKAGE_kmod-video-gspca-sonixb
+		select PACKAGE_kmod-video-gspca-sonixj
+		help
+		  choose package collection to support webcam.
+
+endmenu
+
