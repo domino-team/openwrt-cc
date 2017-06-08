@@ -1,0 +1,40 @@
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -997,11 +997,26 @@ static bool quectel_ec20_detected(struct
+ 	return false;
+ }
+ 
++static void quectel_ec25_ec20_R2_setrawip(struct usb_interface *intf)
++{
++	struct usbnet *dev = usb_get_intfdata(intf);
++	struct qmi_wwan_state *info = (void *)&dev->data;
++	
++	struct usb_device *dev_id = interface_to_usbdev(intf);
++
++	if (le16_to_cpu(dev_id->descriptor.idVendor) == 0x2c7c &&
++		le16_to_cpu(dev_id->descriptor.idProduct) == 0x0125)
++		info->flags |= QMI_WWAN_FLAG_RAWIP;
++	qmi_wwan_netdev_setup(dev->net);
++	//call_netdevice_notifiers(NETDEV_POST_TYPE_CHANGE, dev->net);
++}
++
+ static int qmi_wwan_probe(struct usb_interface *intf,
+ 			  const struct usb_device_id *prod)
+ {
+ 	struct usb_device_id *id = (struct usb_device_id *)prod;
+ 	struct usb_interface_descriptor *desc = &intf->cur_altsetting->desc;
++	int status;
+ 
+ 	/* Workaround to enable dynamic IDs.  This disables usbnet
+ 	 * blacklisting functionality.  Which, if required, can be
+@@ -1019,7 +1034,9 @@ static int qmi_wwan_probe(struct usb_int
+ 		return -ENODEV;
+ 	}
+ 
+-	return usbnet_probe(intf, id);
++	status=usbnet_probe(intf, id);
++	quectel_ec25_ec20_R2_setrawip(intf);
++	return status;
+ }
+ 
+ static struct usb_driver qmi_wwan_driver = {
