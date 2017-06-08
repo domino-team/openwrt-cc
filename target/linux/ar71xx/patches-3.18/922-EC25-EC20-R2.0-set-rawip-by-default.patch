@@ -12,10 +12,10 @@
 +	struct usb_device *dev_id = interface_to_usbdev(intf);
 +
 +	if (le16_to_cpu(dev_id->descriptor.idVendor) == 0x2c7c &&
-+		le16_to_cpu(dev_id->descriptor.idProduct) == 0x0125)
++		le16_to_cpu(dev_id->descriptor.idProduct) == 0x0125){
 +		info->flags |= QMI_WWAN_FLAG_RAWIP;
-+	qmi_wwan_netdev_setup(dev->net);
-+	//call_netdevice_notifiers(NETDEV_POST_TYPE_CHANGE, dev->net);
++	 qmi_wwan_netdev_setup(dev->net);
++	}
 +}
 +
  static int qmi_wwan_probe(struct usb_interface *intf,
