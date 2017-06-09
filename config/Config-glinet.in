@@ -4,7 +4,7 @@
 # See /LICENSE for more information.
 #
 
-menu "Glinet support"
+menu "Gl.iNet package choice shortcut"
 
 	config BASIC_PKG
 		bool "basic package"
@@ -23,24 +23,31 @@ menu "Glinet support"
 		select BUSYBOX_CONFIG_IPCRM
 		select BUSYBOX_CONFIG_IPCS
 		select BUSYBOX_CONFIG_FEATURE_FLOAT_SLEEP
+		select BUSYBOX_CONFIG_NC_SERVER
+		select BUSYBOX_CONFIG_NC_EXTRA
+		select BUSYBOX_CONFIG_NC_110_COMPAT
 		select PACKAGE_lighttpd
 		select PACKAGE_lighttpd-mod-access
 		select PACKAGE_lighttpd-mod-cgi
 		select PACKAGE_lighttpd-mod-expire
 		select PACKAGE_lighttpd-mod-fastcgi
 		select PACKAGE_lighttpd-mod-proxy
-		select PACKAGE_samba36-server
-		select PACKAGE_openvpn-openssl
 		select PACKAGE_unzip
-		select PACKAGE_mc
-		select MC_DIFFVIEWER
-		select MC_EDITOR
-		select MC_SUBSHEL
-		select MC_LARGEFILE
-		select MC_BACKGROUND
-		select MC_CHARSET
-		select MC_VFS
 		select RTC_SUPPORT
+		select PACKAGE_wpa-cli
+		select PACKAGE_kmod-i2c-core
+		select PACKAGE_comgt
+		select PACKAGE_chat
+		select PACKAGE_ip
+		select PACKAGE_kmod-nls-cp437
+		select PACKAGE_kmod-nls-iso8859-1
+		select PACKAGE_kmod-nls-utf8
+		select PACKAGE_kmod-nf-nathelper-extra
+		help
+		  choose basic package collection, include various Busybox options
+
+	config LG_Luci
+		bool "include Luci"
 		select PACKAGE_luci
 		select PACKAGE_luci-mod-rpc
 		select PACKAGE_luci-app-qos
@@ -49,22 +56,12 @@ menu "Glinet support"
 		select PACKAGE_luci-proto-3g
 		select LUCI_LANG_zh-cn
 		select LUCI_LANG_en
-		select PACKAGE_wpa-cli
 		select PACKAGE_luci-app-mwan3
-		select PACKAGE_kmod-i2c-core
-		select PACKAGE_comgt
-		select PACKAGE_chat
-		select PACKAGE_ip
-		select PACKAGE_libopenssl
-		select OPENVPN_openssl_ENABLE_IPROUTE2
-		select PACKAGE_ppp-mod-pptp
-		select PACKAGE_xl2tpd
-		select PACKAGE_kmod-nf-nathelper-extra	
 		help
-		  choose basic package collection.
+		  Include the Luci web UI
 
 	config GL_USB_storage
-		bool "support USB storage"
+		bool "support USB storage and sharing"
 		select PACKAGE_blkid
 		select PACKAGE_kmod-fs-ext4
 		select PACKAGE_kmod-fs-ntfs
@@ -79,6 +76,7 @@ menu "Glinet support"
 		select PACKAGE_kmod-usb-uhci
 		select PACKAGE_kmod-usb2
 		select PACKAGE_kmod-usb-ohci
+		select PACKAGE_samba36-server
 		help
 		  choose package collection to support USB storage
 
@@ -90,6 +88,7 @@ menu "Glinet support"
 		select PACKAGE_kmod-usb-serial-option
 		select PACKAGE_kmod-usb-serial-wwan
 		select PACKAGE_kmod-usb-serial-sierrawireless
+		select PACKAGE_usb-modeswitch
 		help
 		  choose package collection to support ttyUSB modem
 
@@ -99,10 +98,6 @@ menu "Glinet support"
 		select PACKAGE_kmod-usb-net
 		select PACKAGE_kmod-usb-cdc-ether
 		select PACKAGE_kmod-usb-net-rndis
-		select PACKAGE_kmod-usb-net-ipheth
-		select PACKAGE_libusbmuxd
-		select PACKAGE_libimobiledevice
-		select PACKAGE_usbmuxd
 		select PACKAGE_kmod-usb-net-qmi-wwan
 		help
 		  choose package collection to support modem qmi mode
@@ -110,15 +105,23 @@ menu "Glinet support"
 	config GL_huawei_ncm_mode
 		bool "support huawei ncm mode"
 		select PACKAGE_kmod-usb-acm
-		select PACKAGE_usb-modeswitch
 		select PACKAGE_kmod-usb-net-huawei-cdc-ncm
 		select PACKAGE_comgt-directip
 		select PACKAGE_comgt-ncm
 		help
 		  choose package collection to support huawei ncm mode.
 
+	config GL_Tethering
+		bool "support iPhone tethering"
+		select PACKAGE_kmod-usb-net-ipheth
+		select PACKAGE_libusbmuxd
+		select PACKAGE_libimobiledevice
+		select PACKAGE_usbmuxd
+		help
+		  support tethering iphone via USB
+
 	config GL_webcam
-		bool "support webcam"
+		bool "support webcam and streaming"
 		select MJPG_STREAMER_INPUT_UVC
 		select MJPG_STREAMER_OUTPUT_HTTP
 		select PACKAGE_mjpg-streamer
@@ -130,6 +133,34 @@ menu "Glinet support"
 		select PACKAGE_kmod-video-gspca-sonixj
 		help
 		  choose package collection to support webcam.
+
+	config GL_Openvpn
+		bool "Support Openvpn openssl"
+		select PACKAGE_openvpn-openssl
+		select OPENVPN_openssl_ENABLE_IPROUTE2
+		select PACKAGE_libopenssl
+		help
+		  Choose openvpn openssl
+
+	config GL_VPN_other
+		bool "Support PPtP and L2TP"
+		select PACKAGE_ppp-mod-pptp
+		select PACKAGE_xl2tpd
+		help
+		  Choose pptp, l2tp
+
+	config GL_MC
+		bool "Choose MC and select its options"
+		select PACKAGE_mc
+		select MC_DIFFVIEWER
+		select MC_EDITOR
+		select MC_SUBSHEL
+		select MC_LARGEFILE
+		select MC_BACKGROUND
+		select MC_CHARSET
+		select MC_VFS
+		help
+		  MC by default don't select some options, this choose these options
 
 endmenu
 
