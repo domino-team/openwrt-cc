@@ -138,6 +138,8 @@ menu "Gl.iNet package choice shortcut"
 		bool "Support Openvpn openssl"
 		select PACKAGE_openvpn-openssl
 		select OPENVPN_openssl_ENABLE_IPROUTE2
+		select OPENVPN_openssl_ENABLE_MANAGEMENT
+		select OPENVPN_openssl_ENABLE_X509_ALT_USERNAME
 		select PACKAGE_libopenssl
 		help
 		  Choose openvpn openssl
