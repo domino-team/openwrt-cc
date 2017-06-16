@@ -1,0 +1,1 @@
+make SUBARCH=mips  CROSS_COMPILE=mips-openwrt-linux-uclibc- CC=mips-openwrt-linux-uclibc-gcc

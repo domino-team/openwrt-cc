@@ -43,6 +43,7 @@ menu "Gl.iNet package choice shortcut"
 		select PACKAGE_kmod-nls-iso8859-1
 		select PACKAGE_kmod-nls-utf8
 		select PACKAGE_kmod-nf-nathelper-extra
+		select PACKAGE_wpad
 		help
 		  choose basic package collection, include various Busybox options
 
@@ -149,7 +150,17 @@ menu "Gl.iNet package choice shortcut"
 		select PACKAGE_ppp-mod-pptp
 		select PACKAGE_xl2tpd
 		help
-		  Choose pptp, l2tp
+		  Choose pptp, xl2tp
+
+	config GL_Shadowsocks
+		bool "Support shadowsocks etc"
+		select PACKAGE_shadowsocks-libev
+		select PACKAGE_shadowsocks-libev-server
+		select PACKAGE_luci-app-chinadns
+		select PACKAGE_luci-app-dns-forwarder
+		select PACKAGE_luci-app-shadowsocks
+		help
+		  choose shadowsocks-libev and chinadns etc, this include luci
 
 	config GL_MC
 		bool "Choose MC and select its options"

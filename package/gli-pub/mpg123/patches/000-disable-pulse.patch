@@ -1,0 +1,11 @@
+--- a/configure.ac
++++ b/configure.ac
+@@ -1264,7 +1264,7 @@ fi
+ dnl ############## Output module choice
+ 
+ # The full list of supported modules to check, first come, first serve.
+-check_modules="alsa oss coreaudio sndio sun win32 os2 esd jack portaudio pulse sdl nas arts openal dummy"
++check_modules="alsa oss coreaudio sndio sun win32 os2 esd jack portaudio sdl nas arts openal dummy"
+ # The final list.
+ output_modules=
+ 
