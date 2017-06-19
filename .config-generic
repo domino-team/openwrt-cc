@@ -2317,16 +2317,6 @@ CONFIG_PACKAGE_valgrind-vgdb=m
 #
 # domino
 #
-
-#
-# Languages
-#
-CONFIG_PACKAGE_nodejs=m
-
-#
-# Libraries
-#
-CONFIG_PACKAGE_libv8=m
 CONFIG_PACKAGE_kmod-domino-iis=m
 
 #
@@ -9071,4 +9061,3 @@ CONFIG_PACKAGE_openrtsp=m
 # libraries
 #
 CONFIG_PACKAGE_orbit2=m
-CONFIG_OVERRIDE_PKGS="node-cylon node-arduino-firmata node-serialport node-hid"
