@@ -1,5 +1,3 @@
-. /lib/functions/network.sh
-
 wpa_supplicant_add_rate() {
 	local var="$1"
 	local val="$(($2 / 1000))"
@@ -139,11 +137,10 @@ hostapd_common_add_bss_config() {
 	config_add_string nasid
 	config_add_string ownip
 	config_add_string iapp_interface
-	config_add_string eap_type ca_cert client_cert identity anonymous_identity auth priv_key priv_key_pwd
+	config_add_string eap_type ca_cert client_cert identity auth priv_key priv_key_pwd
 
 	config_add_int dynamic_vlan vlan_naming
 	config_add_string vlan_tagged_interface vlan_bridge
-	config_add_string vlan_file
 
 	config_add_string 'key1:wepkey' 'key2:wepkey' 'key3:wepkey' 'key4:wepkey' 'password:wpakey'
 
@@ -255,7 +252,7 @@ hostapd_set_bss_options() {
 				ownip \
 				eap_reauth_period dynamic_vlan \
 				vlan_naming vlan_tagged_interface \
-				vlan_bridge vlan_file
+				vlan_bridge
 
 			# legacy compatibility
 			[ -n "$auth_server" ] || json_get_var auth_server server
@@ -298,10 +295,6 @@ hostapd_set_bss_options() {
 					append bss_conf "vlan_bridge=$vlan_bridge" "$N"
 				[ -n "$vlan_tagged_interface" ] && \
 					append bss_conf "vlan_tagged_interface=$vlan_tagged_interface" "$N"
-				[ -n "$vlan_file" ] && {
-					[ -e "$vlan_file" ] || touch "$vlan_file"
-					append bss_conf "vlan_file=$vlan_file" "$N"
-				}
 			}
 
 			[ "$eapol_version" -ge "1" -a "$eapol_version" -le "2" ] && append bss_conf "eapol_version=$eapol_version" "$N"
@@ -353,9 +346,8 @@ hostapd_set_bss_options() {
 	append bss_conf "ssid=$ssid" "$N"
 	[ -n "$network_bridge" ] && append bss_conf "bridge=$network_bridge" "$N"
 	[ -n "$iapp_interface" ] && {
-		local ifname
-		network_get_device ifname "$iapp_interface" || ifname = "$iapp_interface"
-		append bss_conf "iapp_interface=$ifname" "$N"
+		iapp_interface="$(uci_get_state network "$iapp_interface" ifname "$iapp_interface")"
+		[ -n "$iapp_interface" ] && append bss_conf "iapp_interface=$iapp_interface" "$N"
 	}
 
 	if [ "$wpa" -ge "1" ]; then
@@ -536,15 +528,9 @@ wpa_supplicant_prepare_interface() {
 		_w_modestr="mode=1"
 	}
 
-	local country_str=
-	[ -n "$country" ] && {
-		country_str="country=$country"
-	}
-
 	wpa_supplicant_teardown_interface "$ifname"
 	cat > "$_config" <<EOF
 $ap_scan
-$country_str
 EOF
 	return 0
 }
@@ -558,9 +544,7 @@ wpa_supplicant_add_network() {
 	json_get_vars \
 		ssid bssid key \
 		basic_rate mcast_rate \
-		ieee80211w ieee80211r
-
-	set_default ieee80211r 0
+		ieee80211w
 
 	local key_mgmt='NONE'
 	local enc_str=
@@ -570,8 +554,6 @@ wpa_supplicant_add_network() {
 	local wpa_key_mgmt="WPA-PSK"
 	local scan_ssid="scan_ssid=1"
 	local freq
-
-	[ "$ieee80211r" -gt 0 ] && wpa_key_mgmt="FT-PSK $wpa_key_mgmt"
 
 	[[ "$_w_mode" = "adhoc" ]] && {
 		append network_data "mode=1" "$N$T"
@@ -587,9 +569,6 @@ wpa_supplicant_add_network() {
 	}
 
 	[[ "$_w_mode" = "mesh" ]] && {
-		json_get_vars mesh_id
-		ssid="${mesh_id}"
-
 		append network_data "mode=5" "$N$T"
 		[ -n "$channel" ] && {
 			freq="$(get_freq "$phy" "$channel")"
@@ -621,12 +600,10 @@ wpa_supplicant_add_network() {
 		;;
 		eap)
 			key_mgmt='WPA-EAP'
-		        [ "$ieee80211r" -gt 0 ] && key_mgmt="FT-EAP $key_mgmt"
 
-			json_get_vars eap_type identity anonymous_identity ca_cert
+			json_get_vars eap_type identity ca_cert
 			[ -n "$ca_cert" ] && append network_data "ca_cert=\"$ca_cert\"" "$N$T"
 			[ -n "$identity" ] && append network_data "identity=\"$identity\"" "$N$T"
-			[ -n "$anonymous_identity" ] && append network_data "anonymous_identity=\"$anonymous_identity\"" "$N$T"
 			case "$eap_type" in
 				tls)
 					json_get_vars client_cert priv_key priv_key_pwd
@@ -634,32 +611,11 @@ wpa_supplicant_add_network() {
 					append network_data "private_key=\"$priv_key\"" "$N$T"
 					append network_data "private_key_passwd=\"$priv_key_pwd\"" "$N$T"
 				;;
-				fast|peap|ttls)
-					json_get_vars auth password ca_cert2 client_cert2 priv_key2 priv_key2_pwd
+				peap|ttls)
+					json_get_vars auth password
 					set_default auth MSCHAPV2
-
-					if [ "$auth" = "EAP-TLS" ]; then
-						[ -n "$ca_cert2" ] &&
-							append network_data "ca_cert2=\"$ca_cert2\"" "$N$T"
-						append network_data "client_cert2=\"$client_cert2\"" "$N$T"
-						append network_data "private_key2=\"$priv_key2\"" "$N$T"
-						append network_data "private_key2_passwd=\"$priv_key2_pwd\"" "$N$T"
-					else
-						append network_data "password=\"$password\"" "$N$T"
-					fi
-
-					phase2proto="auth="
-					case "$auth" in
-						"auth"*)
-							phase2proto=""
-						;;
-						"EAP-"*)
-							auth="$(echo $auth | cut -b 5- )"
-							[ "$eap_type" = "ttls" ] &&
-								phase2proto="autheap="
-						;;
-					esac
-					append network_data "phase2=\"$phase2proto$auth\"" "$N$T"
+					append network_data "phase2=\"$auth\"" "$N$T"
+					append network_data "password=\"$password\"" "$N$T"
 				;;
 			esac
 			append network_data "eap=$(echo $eap_type | tr 'a-z' 'A-Z')" "$N$T"
