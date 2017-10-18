@@ -100,6 +100,7 @@ menu "Gl.iNet package choice shortcut"
 		select PACKAGE_kmod-usb-cdc-ether
 		select PACKAGE_kmod-usb-net-rndis
 		select PACKAGE_kmod-usb-net-qmi-wwan
+		select PACKAGE_uqmi
 		help
 		  choose package collection to support modem qmi mode
 
