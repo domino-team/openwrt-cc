@@ -15,7 +15,8 @@ include $(INCLUDE_DIR)/package.mk
 
 define KernelPackage/rtc-sd2068
   SUBMENU:=Other modules
-  DEPENDS:=@TARGET_ar71xx @RTC_SUPPORT
+  DEPENDS:=@TARGET_ar71xx
+  KCONFIG:=CONFIG_RTC_CLASS=y
   TITLE:=Driver for RTC SD2068
   AUTOLOAD:=$(call AutoLoad,70,rtc-sd2068)
   FILES:=$(PKG_BUILD_DIR)/rtc-sd2068.ko
