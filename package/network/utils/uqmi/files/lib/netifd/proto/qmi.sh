@@ -64,9 +64,17 @@ proto_qmi_setup() {
 
 	[ -n "$delay" ] && sleep "$delay"
 
-	while uqmi -s -d "$device" --get-pin-status | grep '"UIM uninitialized"' > /dev/null; do
-		sleep 1;
-	done
+	while true; do
+		uqmi -s -d "$device" --get-pin-status >/tmp/uqmi-pin-status &
+		uqmi_pid=$!
+		sleep 2
+		kill $uqmi_pid 2>/dev/null
+		# kill succeed ie uqmi process blocked
+		[ $? = 0 ] && continue
+		[ ! `grep 'UIM uninitialized' /tmp/uqmi-pin-status` ] && break
+        done
+
+        rm -f /tmp/uqmi-pin-status
 
 	[ -n "$pincode" ] && {
 		uqmi -s -d "$device" --verify-pin1 "$pincode" || {
