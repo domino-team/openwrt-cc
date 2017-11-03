@@ -42,6 +42,11 @@ _proto_qmi_setup() {
 
 	[ -n "$ctl_device" ] && device=$ctl_device
 
+	#delay if modem reset
+	while true; do
+		[ -c "$device" ] && break || sleep 25
+	done
+
 	[ -n "$device" ] || {
 		echo "No control device specified"
 		proto_notify_error "$interface" NO_DEVICE
