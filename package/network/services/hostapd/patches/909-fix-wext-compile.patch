@@ -1,0 +1,21 @@
+--- a/src/drivers/linux_wext.h
++++ b/src/drivers/linux_wext.h
+@@ -26,6 +26,7 @@ typedef int32_t __s32;
+ typedef uint16_t __u16;
+ typedef int16_t __s16;
+ typedef uint8_t __u8;
++typedef int8_t __s8;
+ #ifndef __user
+ #define __user
+ #endif /* __user */
+--- a/src/drivers/nl80211_copy.h
++++ b/src/drivers/nl80211_copy.h
+@@ -49,7 +49,7 @@
+ #define NL80211_MULTICAST_GROUP_MLME		"mlme"
+ #define NL80211_MULTICAST_GROUP_VENDOR		"vendor"
+ #define NL80211_MULTICAST_GROUP_TESTMODE	"testmode"
+-
++typedef int8_t __s8;
+ /**
+  * DOC: Station handling
+  *

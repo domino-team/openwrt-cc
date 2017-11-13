@@ -16,8 +16,6 @@ Signed-off-by: Mathy Vanhoef <Mathy.Vanhoef@cs.kuleuven.be>
  src/rsn_supp/wpa_i.h    |   4 ++
  3 files changed, 87 insertions(+), 44 deletions(-)
 
-diff --git a/src/common/wpa_common.h b/src/common/wpa_common.h
-index af1d0f0..d200285 100644
 --- a/src/common/wpa_common.h
 +++ b/src/common/wpa_common.h
 @@ -217,6 +217,17 @@ struct wpa_ptk {
@@ -38,11 +36,9 @@ index af1d0f0..d200285 100644
  
  /* WPA IE version 1
   * 00-50-f2:1 (OUI:OUI type)
-diff --git a/src/rsn_supp/wpa.c b/src/rsn_supp/wpa.c
-index 3c47879..95bd7be 100644
 --- a/src/rsn_supp/wpa.c
 +++ b/src/rsn_supp/wpa.c
-@@ -714,6 +714,15 @@ static int wpa_supplicant_install_gtk(struct wpa_sm *sm,
+@@ -714,6 +714,15 @@ static int wpa_supplicant_install_gtk(st
  	const u8 *_gtk = gd->gtk;
  	u8 gtk_buf[32];
  
@@ -58,7 +54,7 @@ index 3c47879..95bd7be 100644
  	wpa_hexdump_key(MSG_DEBUG, "WPA: Group Key", gd->gtk, gd->gtk_len);
  	wpa_dbg(sm->ctx->msg_ctx, MSG_DEBUG,
  		"WPA: Installing GTK to the driver (keyidx=%d tx=%d len=%d)",
-@@ -748,6 +757,9 @@ static int wpa_supplicant_install_gtk(struct wpa_sm *sm,
+@@ -748,6 +757,9 @@ static int wpa_supplicant_install_gtk(st
  	}
  	os_memset(gtk_buf, 0, sizeof(gtk_buf));
  
@@ -68,7 +64,7 @@ index 3c47879..95bd7be 100644
  	return 0;
  }
  
-@@ -854,6 +866,48 @@ static int wpa_supplicant_pairwise_gtk(struct wpa_sm *sm,
+@@ -854,6 +866,48 @@ static int wpa_supplicant_pairwise_gtk(s
  }
  
  
@@ -117,7 +113,7 @@ index 3c47879..95bd7be 100644
  static int ieee80211w_set_keys(struct wpa_sm *sm,
  			       struct wpa_eapol_ie_parse *ie)
  {
-@@ -864,30 +918,14 @@ static int ieee80211w_set_keys(struct wpa_sm *sm,
+@@ -864,30 +918,14 @@ static int ieee80211w_set_keys(struct wp
  	if (ie->igtk) {
  		size_t len;
  		const struct wpa_igtk_kde *igtk;
@@ -137,7 +133,8 @@ index 3c47879..95bd7be 100644
 -		if (keyidx > 4095) {
 -			wpa_msg(sm->ctx->msg_ctx, MSG_WARNING,
 -				"WPA: Invalid IGTK KeyID %d", keyidx);
--			return -1;
++		if (wpa_supplicant_install_igtk(sm, igtk) < 0)
+ 			return -1;
 -		}
 -		if (wpa_sm_set_key(sm, wpa_cipher_to_alg(sm->mgmt_group_cipher),
 -				   broadcast_ether_addr,
@@ -145,13 +142,12 @@ index 3c47879..95bd7be 100644
 -				   igtk->igtk, len) < 0) {
 -			wpa_msg(sm->ctx->msg_ctx, MSG_WARNING,
 -				"WPA: Failed to configure IGTK to the driver");
-+		if (wpa_supplicant_install_igtk(sm, igtk) < 0)
- 			return -1;
+-			return -1;
 -		}
  	}
  
  	return 0;
-@@ -2307,7 +2345,7 @@ void wpa_sm_deinit(struct wpa_sm *sm)
+@@ -2310,7 +2348,7 @@ void wpa_sm_deinit(struct wpa_sm *sm)
   */
  void wpa_sm_notify_assoc(struct wpa_sm *sm, const u8 *bssid)
  {
@@ -160,7 +156,7 @@ index 3c47879..95bd7be 100644
  
  	if (sm == NULL)
  		return;
-@@ -2333,11 +2371,11 @@ void wpa_sm_notify_assoc(struct wpa_sm *sm, const u8 *bssid)
+@@ -2336,11 +2374,11 @@ void wpa_sm_notify_assoc(struct wpa_sm *
  		/* Prepare for the next transition */
  		wpa_ft_prepare_auth_request(sm, NULL);
  
@@ -174,7 +170,7 @@ index 3c47879..95bd7be 100644
  		/*
  		 * IEEE 802.11, 8.4.10: Delete PTK SA on (re)association if
  		 * this is not part of a Fast BSS Transition.
-@@ -2347,6 +2385,10 @@ void wpa_sm_notify_assoc(struct wpa_sm *sm, const u8 *bssid)
+@@ -2350,6 +2388,10 @@ void wpa_sm_notify_assoc(struct wpa_sm *
  		os_memset(&sm->ptk, 0, sizeof(sm->ptk));
  		sm->tptk_set = 0;
  		os_memset(&sm->tptk, 0, sizeof(sm->tptk));
@@ -185,7 +181,7 @@ index 3c47879..95bd7be 100644
  	}
  
  #ifdef CONFIG_TDLS
-@@ -2877,6 +2919,10 @@ void wpa_sm_drop_sa(struct wpa_sm *sm)
+@@ -2880,6 +2922,10 @@ void wpa_sm_drop_sa(struct wpa_sm *sm)
  	os_memset(sm->pmk, 0, sizeof(sm->pmk));
  	os_memset(&sm->ptk, 0, sizeof(sm->ptk));
  	os_memset(&sm->tptk, 0, sizeof(sm->tptk));
@@ -196,13 +192,14 @@ index 3c47879..95bd7be 100644
  #ifdef CONFIG_IEEE80211R
  	os_memset(sm->xxkey, 0, sizeof(sm->xxkey));
  	os_memset(sm->pmk_r0, 0, sizeof(sm->pmk_r0));
-@@ -2949,29 +2995,11 @@ int wpa_wnmsleep_install_key(struct wpa_sm *sm, u8 subelem_id, u8 *buf)
+@@ -2952,29 +2998,11 @@ int wpa_wnmsleep_install_key(struct wpa_
  		os_memset(&gd, 0, sizeof(gd));
  #ifdef CONFIG_IEEE80211W
  	} else if (subelem_id == WNM_SLEEP_SUBELEM_IGTK) {
 -		struct wpa_igtk_kde igd;
 -		u16 keyidx;
--
++		const struct wpa_igtk_kde *igtk;
+ 
 -		os_memset(&igd, 0, sizeof(igd));
 -		keylen = wpa_cipher_key_len(sm->mgmt_group_cipher);
 -		os_memcpy(igd.keyid, buf + 2, 2);
@@ -220,8 +217,6 @@ index 3c47879..95bd7be 100644
 -			wpa_printf(MSG_DEBUG, "Failed to install the IGTK in "
 -				   "WNM mode");
 -			os_memset(&igd, 0, sizeof(igd));
-+		const struct wpa_igtk_kde *igtk;
-+
 +		igtk = (const struct wpa_igtk_kde *) (buf + 2);
 +		if (wpa_supplicant_install_igtk(sm, igtk) < 0)
  			return -1;
@@ -230,8 +225,6 @@ index 3c47879..95bd7be 100644
  #endif /* CONFIG_IEEE80211W */
  	} else {
  		wpa_printf(MSG_DEBUG, "Unknown element id");
-diff --git a/src/rsn_supp/wpa_i.h b/src/rsn_supp/wpa_i.h
-index f653ba6..afc9e37 100644
 --- a/src/rsn_supp/wpa_i.h
 +++ b/src/rsn_supp/wpa_i.h
 @@ -31,6 +31,10 @@ struct wpa_sm {
@@ -245,6 +238,3 @@ index f653ba6..afc9e37 100644
  
  	struct eapol_sm *eapol; /* EAPOL state machine from upper level code */
  
--- 
-2.7.4
-

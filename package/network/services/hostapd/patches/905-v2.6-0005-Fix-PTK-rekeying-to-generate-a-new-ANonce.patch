@@ -17,8 +17,6 @@ Signed-off-by: Jouni Malinen <j@w1.fi>
  src/ap/wpa_auth.c | 24 +++++++++++++++++++++---
  1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/src/ap/wpa_auth.c b/src/ap/wpa_auth.c
-index 707971d..bf10cc1 100644
 --- a/src/ap/wpa_auth.c
 +++ b/src/ap/wpa_auth.c
 @@ -1901,6 +1901,21 @@ SM_STATE(WPA_PTK, AUTHENTICATION2)
@@ -59,6 +57,3 @@ index 707971d..bf10cc1 100644
  	case WPA_PTK_INITIALIZE:
  		break;
  	case WPA_PTK_DISCONNECT:
--- 
-2.7.4
-
