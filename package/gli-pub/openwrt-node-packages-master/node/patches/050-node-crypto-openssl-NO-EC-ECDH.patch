@@ -1,0 +1,155 @@
+--- a/src/node_constants.cc
++++ b/src/node_constants.cc
+@@ -14,7 +14,10 @@
+ #include <sys/stat.h>
+ 
+ #if HAVE_OPENSSL
+-# include <openssl/ec.h>
++# include <openssl/ssl.h>
++# ifndef OPENSSL_NO_ECDH
++#  include <openssl/ec.h>
++# endif
+ # include <openssl/ssl.h>
+ # ifndef OPENSSL_NO_ENGINE
+ #  include <openssl/engine.h>
+@@ -976,11 +979,11 @@ void DefineOpenSSLConstants(Local<Object
+ 
+ #if HAVE_OPENSSL
+   // NOTE: These are not defines
++  #ifndef OPENSSL_NO_EC
+   NODE_DEFINE_CONSTANT(target, POINT_CONVERSION_COMPRESSED);
+-
+   NODE_DEFINE_CONSTANT(target, POINT_CONVERSION_UNCOMPRESSED);
+-
+   NODE_DEFINE_CONSTANT(target, POINT_CONVERSION_HYBRID);
++  #endif
+ #endif
+ }
+ 
+--- a/src/node_crypto.cc
++++ b/src/node_crypto.cc
+@@ -280,7 +280,9 @@ void SecureContext::Initialize(Environme
+   env->SetProtoMethod(t, "addCRL", SecureContext::AddCRL);
+   env->SetProtoMethod(t, "addRootCerts", SecureContext::AddRootCerts);
+   env->SetProtoMethod(t, "setCiphers", SecureContext::SetCiphers);
++#ifndef OPENSSL_NO_ECDH
+   env->SetProtoMethod(t, "setECDHCurve", SecureContext::SetECDHCurve);
++#endif
+   env->SetProtoMethod(t, "setDHParam", SecureContext::SetDHParam);
+   env->SetProtoMethod(t, "setOptions", SecureContext::SetOptions);
+   env->SetProtoMethod(t, "setSessionIdContext",
+@@ -800,6 +802,9 @@ void SecureContext::SetECDHCurve(const F
+   ASSIGN_OR_RETURN_UNWRAP(&sc, args.Holder());
+   Environment* env = sc->env();
+ 
++#ifdef OPENSSL_NO_ECDH
++  return env->ThrowError("ECDH not implemented!");
++#else
+   if (args.Length() != 1)
+     return env->ThrowTypeError("ECDH curve name argument is mandatory");
+ 
+@@ -821,6 +826,7 @@ void SecureContext::SetECDHCurve(const F
+   SSL_CTX_set_tmp_ecdh(sc->ctx_, ecdh);
+ 
+   EC_KEY_free(ecdh);
++#endif
+ }
+ 
+ 
+@@ -1874,6 +1880,9 @@ void SSLWrap<Base>::GetEphemeralKeyInfo(
+         break;
+       case EVP_PKEY_EC:
+         {
++	#ifdef OPENSSL_NO_ECDH
++	  return env->ThrowError("ECDH not implemented!");
++	#else
+           EC_KEY* ec = EVP_PKEY_get1_EC_KEY(key);
+           int nid = EC_GROUP_get_curve_name(EC_KEY_get0_group(ec));
+           EC_KEY_free(ec);
+@@ -1883,6 +1892,7 @@ void SSLWrap<Base>::GetEphemeralKeyInfo(
+                     OneByteString(args.GetIsolate(), OBJ_nid2sn(nid)));
+           info->Set(env->size_string(),
+                     Integer::New(env->isolate(), EVP_PKEY_bits(key)));
++	#endif
+         }
+     }
+     EVP_PKEY_free(key);
+@@ -4806,7 +4816,7 @@ bool DiffieHellman::VerifyContext() {
+   return true;
+ }
+ 
+-
++#ifndef OPENSSL_NO_ECDH
+ void ECDH::Initialize(Environment* env, Local<Object> target) {
+   HandleScope scope(env->isolate());
+ 
+@@ -5078,7 +5088,7 @@ bool ECDH::IsKeyPairValid() {
+   (void) &mark_pop_error_on_return;  // Silence compiler warning.
+   return 1 == EC_KEY_check_key(key_);
+ }
+-
++#endif
+ 
+ class PBKDF2Request : public AsyncWrap {
+  public:
+@@ -5589,6 +5599,9 @@ void GetHashes(const FunctionCallbackInf
+ 
+ void GetCurves(const FunctionCallbackInfo<Value>& args) {
+   Environment* env = Environment::GetCurrent(args);
++#ifdef OPENSSL_NO_ECDH
++  return env->ThrowError("EC not implemented!");
++#else
+   const size_t num_curves = EC_get_builtin_curves(nullptr, 0);
+   Local<Array> arr = Array::New(env->isolate(), num_curves);
+   EC_builtin_curve* curves;
+@@ -5610,6 +5623,7 @@ void GetCurves(const FunctionCallbackInf
+   }
+ 
+   args.GetReturnValue().Set(arr);
++#endif
+ }
+ 
+ 
+@@ -5924,7 +5938,9 @@ void InitCrypto(Local<Object> target,
+   Connection::Initialize(env, target);
+   CipherBase::Initialize(env, target);
+   DiffieHellman::Initialize(env, target);
++#ifndef OPENSSL_NO_ECDH
+   ECDH::Initialize(env, target);
++#endif
+   Hmac::Initialize(env, target);
+   Hash::Initialize(env, target);
+   Sign::Initialize(env, target);
+--- a/src/node_crypto.h
++++ b/src/node_crypto.h
+@@ -18,8 +18,12 @@
+ #include "v8.h"
+ 
+ #include <openssl/ssl.h>
+-#include <openssl/ec.h>
+-#include <openssl/ecdh.h>
++#ifndef OPENSSL_NO_EC
++# include <openssl/ec.h>
++#endif
++#ifndef OPENSSL_NO_ECDH
++# include <openssl/ecdh.h>
++#endif
+ #ifndef OPENSSL_NO_ENGINE
+ # include <openssl/engine.h>
+ #endif  // !OPENSSL_NO_ENGINE
+@@ -691,6 +695,7 @@ class DiffieHellman : public BaseObject
+   DH* dh;
+ };
+ 
++#ifndef OPENSSL_NO_ECDH
+ class ECDH : public BaseObject {
+  public:
+   ~ECDH() override {
+@@ -727,6 +732,7 @@ class ECDH : public BaseObject {
+   EC_KEY* key_;
+   const EC_GROUP* group_;
+ };
++#endif
+ 
+ bool EntropySource(unsigned char* buffer, size_t length);
+ #ifndef OPENSSL_NO_ENGINE
