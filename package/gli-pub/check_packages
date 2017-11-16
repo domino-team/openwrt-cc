@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+#
+# This script is responsible for dealing with the same package with feeds.
+# 1. Remove the same package with feeds directory
+#
+
+PUBLIC_DIR="$PWD"
+FEEDS_DIR="$PWD/../feeds"
+
+LISTS=`ls $PUBLIC_DIR`
+
+function uninstall_package() {
+	local pkg
+	local pkg_path
+	local pkg_name
+
+	for pkg in $LISTS;do
+		[ -f "$pkg" ] && continue
+		pkg_name=${pkg##*/}
+		echo "$pkg_name found, Checking for older version"
+		pkg_path=$(find "$FEEDS_DIR" -name "$pkg_name")
+		if [ -n "$pkg_path" -a -d "$pkg_path" ]; then
+			echo "Clear: Package is unique"
+			echo
+		else
+			echo "package is not unique, found in '$pkg_path', Uninstalling"
+			./scripts/feeds uninstall "$pkg" >/dev/null 2>&1
+			echo
+		fi
+
+	done
+}
+
+uninstall_package
