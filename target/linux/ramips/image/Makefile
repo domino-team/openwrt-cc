@@ -1023,10 +1023,12 @@ endef
 #
 
 Image/Build/Profile/MT7628=$(call BuildFirmware/Default4M/$(1),$(1),mt7628,MT7628)
+Image/Build/Profile/GL-MT300N-V2=$(call BuildFirmware/Default16M/$(1),$(1),gl-mt300n-v2,GL-MT300N-V2)
 
 ifeq ($(SUBTARGET),mt7628)
 define Image/Build/Profile/Default
 	$(call Image/Build/Profile/MT7628,$(1))
+	$(call Image/Build/Profile/GL-MT300N-V2,$(1))
 endef
 endif
 
